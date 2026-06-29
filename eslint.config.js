@@ -44,4 +44,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // src/shared/ui/ es una libreria generada por shadcn/ui cuyos patrones de
+    // export (ej: buttonVariants, useFormField) no siguen las reglas de react-refresh.
+    files: ['src/shared/ui/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 )

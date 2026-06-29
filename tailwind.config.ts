@@ -5,7 +5,6 @@ const config: Config = {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
-    // Mobile First: los breakpoints se aplican hacia arriba (min-width)
     screens: {
       sm: '640px',
       md: '768px',
@@ -48,14 +47,64 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Estados de tickets (configurables desde BD; colores base aqui)
+        // Colores semanticos del sistema
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+        },
+        // Estados de tickets (configurables desde BD)
         ticket: {
-          unassigned: 'hsl(var(--ticket-unassigned, 220 9% 46%))',
-          assigned: 'hsl(var(--ticket-assigned, 221 83% 53%))',
-          in_progress: 'hsl(var(--ticket-in-progress, 25 95% 53%))',
-          pending: 'hsl(var(--ticket-pending, 45 93% 47%))',
-          closed: 'hsl(var(--ticket-closed, 142 71% 45%))',
-          reopened: 'hsl(var(--ticket-reopened, 0 84% 60%))',
+          'sin-asignar': {
+            DEFAULT: 'hsl(var(--ticket-sin-asignar))',
+            foreground: 'hsl(var(--ticket-sin-asignar-foreground))',
+          },
+          asignado: {
+            DEFAULT: 'hsl(var(--ticket-asignado))',
+            foreground: 'hsl(var(--ticket-asignado-foreground))',
+          },
+          'en-proceso': {
+            DEFAULT: 'hsl(var(--ticket-en-proceso))',
+            foreground: 'hsl(var(--ticket-en-proceso-foreground))',
+          },
+          pendiente: {
+            DEFAULT: 'hsl(var(--ticket-pendiente))',
+            foreground: 'hsl(var(--ticket-pendiente-foreground))',
+          },
+          cerrado: {
+            DEFAULT: 'hsl(var(--ticket-cerrado))',
+            foreground: 'hsl(var(--ticket-cerrado-foreground))',
+          },
+          reabierto: {
+            DEFAULT: 'hsl(var(--ticket-reabierto))',
+            foreground: 'hsl(var(--ticket-reabierto-foreground))',
+          },
+        },
+        // Prioridades de tickets
+        priority: {
+          baja: {
+            DEFAULT: 'hsl(var(--priority-baja))',
+            foreground: 'hsl(var(--priority-baja-foreground))',
+          },
+          media: {
+            DEFAULT: 'hsl(var(--priority-media))',
+            foreground: 'hsl(var(--priority-media-foreground))',
+          },
+          alta: {
+            DEFAULT: 'hsl(var(--priority-alta))',
+            foreground: 'hsl(var(--priority-alta-foreground))',
+          },
+          critica: {
+            DEFAULT: 'hsl(var(--priority-critica))',
+            foreground: 'hsl(var(--priority-critica-foreground))',
+          },
         },
       },
       borderRadius: {
@@ -67,13 +116,16 @@ const config: Config = {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        // Escala tipografica accesible
         xs: ['0.75rem', { lineHeight: '1rem' }],
         sm: ['0.875rem', { lineHeight: '1.25rem' }],
         base: ['1rem', { lineHeight: '1.5rem' }],
         lg: ['1.125rem', { lineHeight: '1.75rem' }],
         xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        display: ['3.75rem', { lineHeight: '1', letterSpacing: '-0.02em' }],
       },
       spacing: {
         'safe-bottom': 'env(safe-area-inset-bottom)',
@@ -81,6 +133,38 @@ const config: Config = {
       },
       minHeight: {
         screen: ['100vh', '100dvh'],
+      },
+      width: {
+        sidebar: '260px',
+        'sidebar-collapsed': '64px',
+      },
+      maxWidth: {
+        sidebar: '260px',
+      },
+      height: {
+        header: '56px',
+      },
+      keyframes: {
+        'accordion-down': {
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+        },
+        'accordion-up': {
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
