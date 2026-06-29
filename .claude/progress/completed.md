@@ -2,6 +2,28 @@
 
 > Registro acumulativo. Se añade al final; no se borra.
 
+## Fase 1 — Inicialización
+
+- **2026-06-29** — Proyecto React 19 + Vite + TypeScript scaffolded manualmente.
+- **2026-06-29** — TypeScript strict configurado (`noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`).
+- **2026-06-29** — ESLint 9 (flat config) + Prettier 3 + prettier-plugin-tailwindcss.
+- **2026-06-29** — TailwindCSS 3 (Mobile First) + variables CSS para estados de tickets.
+- **2026-06-29** — `components.json` de shadcn/ui configurado (listo para `npx shadcn add`).
+- **2026-06-29** — React Router DOM 6 con router base y layout vacío.
+- **2026-06-29** — TanStack Query 5 + Zustand 5 + React Hook Form 7 + Zod 3.
+- **2026-06-29** — Cliente Supabase JS 2 (`src/services/supabase.ts`).
+- **2026-06-29** — `.env.example` con todas las variables requeridas por el SDD.
+- **2026-06-29** — Alias de importación configurados en `vite.config.ts` y `tsconfig.json`.
+- **2026-06-29** — Estructura `src/` completa: app, features (9), shared (9 dirs), services, hooks, store, types, utils, constants, lib, styles, assets.
+- **2026-06-29** — ThemeProvider (dark/light/system) + useTheme hook separados.
+- **2026-06-29** — Zustand stores: `auth.store.ts` y `ui.store.ts`.
+- **2026-06-29** — Inter font, favicon SVG, meta tags PWA Mobile First en `index.html`.
+- **2026-06-29** — Vitest 2 + Testing Library 16 + 5 tests unitarios pasando.
+- **2026-06-29** — Playwright 1 configurado (Desktop Chrome + Pixel 5 + iPhone 12).
+- **2026-06-29** — Husky 9 + lint-staged 15 (pre-commit hook activo).
+- **2026-06-29** — Build de producción: ✅ 1.93s, 97.78 kB gzip.
+- **2026-06-29** — Vulnerabilidad moderada (esbuild dev-server) documentada; no afecta producción.
+
 ## Fase 0 — Infraestructura
 
 - **2026-06-29** — Análisis de la estructura existente del proyecto.

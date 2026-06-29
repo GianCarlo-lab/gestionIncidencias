@@ -1,13 +1,17 @@
 # Fase Actual
 
-## Fase 0 — Infraestructura · `en progreso`
+## Fase 1 — Inicialización · `completada` | Siguiente: Fase 2 — Base de Datos
+
+---
+
+## Fase 0 — Infraestructura · `completada`
 
 **Objetivo:** Preparar toda la infraestructura del proyecto antes de desarrollar funcionalidades: estructura `.claude/`, memoria persistente, subagentes, skills, flujo de trabajo y reglas de commits.
 
 **No se desarrolla ninguna funcionalidad del sistema en esta fase.**
 
 ### Tarea en curso
-Creación de la carpeta `.claude` completa y sus componentes operativos.
+Esperando aprobación para iniciar Fase 2 — Base de Datos.
 
 ### Criterios de finalización (Fase 0)
 - [x] SDD leído y comprendido (no modificado).
