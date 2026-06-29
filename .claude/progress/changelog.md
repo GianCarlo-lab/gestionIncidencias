@@ -2,6 +2,33 @@
 
 > Cambios significativos del proyecto. Formato: fecha — descripción. Se actualiza tras cada commit.
 
+## [Sin versión] — Fase 3 · Aplicación con Mock Data
+
+### 2026-06-29
+- `src/mocks/data.ts`: 15 tickets realistas, 7 usuarios, 4 sucursales, 9 áreas, tipos de ticket, 8 notificaciones, datos de tendencia (16 días) para gráficos.
+- `src/constants/index.ts`: ruta `DESIGN_SYSTEM` añadida; helper `ticketDetailPath(id)`.
+- `src/app/components/AppSidebar.tsx`: sidebar role-based (worker vs admin), navegación con badges de conteo, acceso rápido a nuevo ticket, footer con avatar del usuario.
+- `src/app/components/AppHeader.tsx`: header con hamburger (mobile), título dinámico por ruta, campana de notificaciones con badge, dropdown de usuario.
+- `src/app/components/MobileNav.tsx`: navegación inferior con 5 tabs y FAB flotante para nuevo ticket.
+- `src/app/layouts/AuthLayout.tsx`: layout de autenticación (panel branded desktop + panel de formulario).
+- `src/app/layouts/AppLayout.tsx`: layout principal (sidebar desktop + Sheet mobile + header + bottom nav).
+- `src/app/router/index.tsx`: router completo con guards RequireAuth / RequireGuest; 12 rutas.
+- `src/features/auth/pages/LoginPage.tsx`: login con validación Zod, toggle contraseña, 3 botones de acceso demo.
+- `src/features/dashboard/pages/DashboardPage.tsx`: dashboard adaptativo — trabajador (mis stats) / admin (6 cards + LineChart Recharts + tickets recientes).
+- `src/features/tickets/pages/MyTicketsPage.tsx`: lista con búsqueda, filtros estado/prioridad, paginación, card layout responsive.
+- `src/features/tickets/pages/CreateTicketPage.tsx`: formulario con RHF + Zod, selector de área dependiente de sucursal, adjuntos mock, estado de éxito.
+- `src/features/tickets/pages/TicketDetailPage.tsx`: descripción, tabs (comentarios/historial/evidencias) con badges de conteo, burbuja de comentarios, timeline de historial, acciones contextuales.
+- `src/features/users/pages/UsersPage.tsx`: gestión de usuarios con stats, filtros, badges de rol coloreados, sección sucursales/áreas.
+- `src/features/notifications/pages/NotificationsPage.tsx`: tabs todas/sin leer/leídas, timestamps relativos, íconos por tipo.
+- `src/features/profile/pages/ProfilePage.tsx`: datos personales pre-cargados, cambio de contraseña, preferencias de notificación y apariencia.
+- `src/features/reports/pages/ReportsPage.tsx`: BarChart por sucursal, PieChart por prioridad, BarChart horizontal por tipo, lista de reportes.
+- `src/features/audit/pages/AuditPage.tsx`: log de eventos con íconos coloreados por tipo, búsqueda, summary de conteos.
+- `src/features/settings/pages/SettingsPage.tsx`: configuración general, seguridad, tickets, notificaciones, zona de peligro.
+- `vite.config.ts`: alias `@mocks` añadido; port usa `process.env.PORT` (para preview server).
+- `tsconfig.json`: paths `@mocks/*` añadido.
+- `.claude/launch.json`: configuración del preview server para desarrollo.
+- Build prod: OK (9.74s). TypeScript: 0 errores. ESLint: 0 errores, 0 warnings.
+
 ## [Sin versión] — Fase 2 · Design System
 
 ### 2026-06-29

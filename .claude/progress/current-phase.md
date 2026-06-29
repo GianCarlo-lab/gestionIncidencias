@@ -1,40 +1,60 @@
 # Fase Actual
 
-## Fase 2 — Design System · `en_progreso` | Siguiente: Fase 3 — Layout General
+## Fase 3 — Aplicación con Mock Data · `completada técnicamente` | Pendiente: aprobación del usuario
 
 > **Modo activo: Frontend First** — Aprobado por usuario el 2026-06-29.
-> Orden modificado: Design System → Layout → UI Mock Data → DB → Backend → Integración real.
+> Orden modificado: Design System → UI Mock Data → DB → Backend → Integración real.
+> El objetivo de esta fase fue redefinido: en lugar de un layout genérico, se construyó la
+> aplicación completa navegable con Mock Data.
 
 ---
 
-## Objetivo
+## Pantallas implementadas (12 rutas)
 
-Definir y construir la capa visual completa: tokens de diseño, componentes base (shadcn/ui), componentes personalizados del dominio, iconografía, sistema tipográfico y una página `/ui` de verificación (Design System Showcase) navegable y con soporte dark/light.
+- [x] `/login` — Login con demo users (Trabajador, Admin, SuperAdmin)
+- [x] `/dashboard` — Dashboard adaptativo (Trabajador vs Administrador con Recharts)
+- [x] `/tickets` — Lista con búsqueda, filtros estado/prioridad, paginación
+- [x] `/tickets/nuevo` — Formulario completo (tipo, prioridad, sucursal, área, adjuntos)
+- [x] `/tickets/:id` — Detalle con tabs (comentarios / historial / evidencias), acciones
+- [x] `/usuarios` — Gestión de usuarios, sucursales, áreas
+- [x] `/notificaciones` — Tabs (todas/sin leer/leídas), timestamps relativos
+- [x] `/perfil` — Datos personales, contraseña, preferencias
+- [x] `/reportes` — Gráficos (bar, pie, horizontal), reportes disponibles
+- [x] `/auditoria` — Log de eventos, filtros, exportar
+- [x] `/configuracion` — Settings global del sistema
+- [x] `/ui` — Design System Showcase (Fase 2, mantenida)
 
----
+## Infraestructura añadida
 
-## Criterios de finalización (Fase 2)
+- `src/mocks/data.ts` — 15 tickets, 7 usuarios, 4 sucursales, 9 áreas, 8 notificaciones, trend data
+- `src/app/components/AppSidebar.tsx` — Sidebar role-based (desktop)
+- `src/app/components/AppHeader.tsx` — Header con notificaciones + avatar dropdown
+- `src/app/components/MobileNav.tsx` — Navegación inferior con FAB para nuevo ticket
+- `src/app/layouts/AuthLayout.tsx` — Layout de autenticación (branded panel desktop)
+- `src/app/layouts/AppLayout.tsx` — Layout principal (sidebar + header + bottom nav)
+- `src/app/router/index.tsx` — Router completo con guards RequireAuth / RequireGuest
+- `.claude/launch.json` — Configuración del preview server
 
-- [x] Decisión ADR-004 registrada (Frontend First).
-- [x] `project-status.json` actualizado con nuevo orden de fases.
-- [ ] `globals.css` con tokens semánticos completos (success, warning, info, priority, ticket-foregrounds).
-- [ ] `tailwind.config.ts` con colores semánticos mapeados.
-- [ ] Componentes shadcn/ui instalados (≥20 componentes base).
-- [ ] Componentes personalizados creados: `Spinner`, `EmptyState`, `StatusBadge`, `PriorityBadge`, `ConfirmDialog`.
-- [ ] Página `/ui` — Design System Showcase visible y navegable.
-- [ ] Soporte dark/light funcional en todos los componentes.
-- [ ] TypeScript: 0 errores.
-- [ ] ESLint: 0 errores, 0 warnings.
-- [ ] Build de producción: OK.
-- [ ] Commit realizado con validación Git Guardian + Release Reviewer.
-- [ ] Informe presentado y **aprobación del usuario** para iniciar Fase 3.
+## Validaciones
+
+- TypeScript: 0 errores
+- ESLint: 0 errores, 0 warnings
+- Build producción: exitoso (9.74s)
+- Preview: todas las rutas verificadas visualmente
+
+## Próximo paso (pendiente aprobación)
+
+Fase 4 — Base de Datos (Supabase): migraciones, índices, RLS, seeds, triggers.
 
 ---
 
 ## Fases anteriores completadas
 
+### Fase 2 — Design System · `completada`
+Paleta semántica, tokens CSS, shadcn/ui (27 componentes), Spinner, EmptyState, StatusBadge, PriorityBadge, ConfirmDialog, página `/ui`.
+
 ### Fase 1 — Inicialización · `completada`
-React 19 + Vite 5 + TypeScript strict + ESLint + Prettier + Tailwind + shadcn/ui setup + React Router + TanStack Query + Zustand + Supabase + Vitest + Playwright + Husky. Build OK, 5 tests.
+React 19 + Vite 5 + TypeScript strict + ESLint + Prettier + Tailwind + shadcn/ui setup + React Router + TanStack Query + Zustand + Supabase + Vitest + Playwright + Husky.
 
 ### Fase 0 — Infraestructura · `completada`
-Estructura `.claude/`, memoria persistente, 11 subagentes, skill control-de-commits, reglas de commits, `.gitignore`.
+Estructura `.claude/`, 11 subagentes, skill control-de-commits, reglas de commits.
