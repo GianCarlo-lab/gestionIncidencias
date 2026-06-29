@@ -14,7 +14,12 @@ export const ROUTES = {
   NOTIFICATIONS: '/notificaciones',
   REPORTS: '/reportes',
   AUDIT: '/auditoria',
+  DESIGN_SYSTEM: '/ui',
 } as const
+
+export function ticketDetailPath(id: string) {
+  return `/tickets/${id}`
+}
 
 // Paginacion por defecto
 export const DEFAULT_PAGE_SIZE = 20
