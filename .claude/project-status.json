@@ -1,0 +1,47 @@
+{
+  "proyecto": "Pide Servicio",
+  "version_sdd": "1.0",
+  "documento_oficial": "docs/SDD-PideServicio.md",
+  "fase_actual": {
+    "numero": 0,
+    "nombre": "Infraestructura",
+    "estado": "en_progreso",
+    "descripcion": "Preparacion de .claude, subagentes, skills, flujo de trabajo y reglas de commits. No se desarrollan funcionalidades."
+  },
+  "fases": [
+    { "numero": 0, "nombre": "Infraestructura", "estado": "en_progreso" },
+    { "numero": 1, "nombre": "Inicializacion", "estado": "pendiente" },
+    { "numero": 2, "nombre": "Base de Datos", "estado": "pendiente" },
+    { "numero": 3, "nombre": "Autenticacion", "estado": "pendiente" },
+    { "numero": 4, "nombre": "Layout Base", "estado": "pendiente" },
+    { "numero": 5, "nombre": "Componentes Base", "estado": "pendiente" },
+    { "numero": 6, "nombre": "Modulos", "estado": "pendiente" },
+    { "numero": 7, "nombre": "Optimizacion", "estado": "pendiente" },
+    { "numero": 8, "nombre": "Testing", "estado": "pendiente" },
+    { "numero": 9, "nombre": "Produccion", "estado": "pendiente" }
+  ],
+  "modulos": {
+    "orden": ["usuarios", "configuracion", "tickets", "dashboard", "notificaciones", "auditoria", "reportes"],
+    "estado": {
+      "usuarios": "pendiente",
+      "configuracion": "pendiente",
+      "tickets": "pendiente",
+      "dashboard": "pendiente",
+      "notificaciones": "pendiente",
+      "auditoria": "pendiente",
+      "reportes": "pendiente"
+    }
+  },
+  "stack": {
+    "frontend": ["React 19", "TypeScript", "Vite", "TailwindCSS", "shadcn/ui", "React Router DOM", "TanStack Query", "Zustand", "React Hook Form", "Zod", "Lucide React", "Framer Motion", "Sonner", "Recharts", "Supabase JS"],
+    "backend": ["Supabase PostgreSQL", "Supabase Auth", "Supabase Storage", "Supabase Realtime", "Edge Functions", "RLS"]
+  },
+  "metricas": {
+    "epics_total": 10,
+    "historias_total": 39,
+    "historias_completadas": 0
+  },
+  "ultimo_commit_estable": "13af832",
+  "ultima_actualizacion": "2026-06-29",
+  "notas": "project-status.json debe actualizarse despues de cada tarea y cada commit (responsable: documentation-manager)."
+}

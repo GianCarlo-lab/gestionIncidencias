@@ -1,0 +1,18 @@
+# Normalizar finales de linea para consistencia entre plataformas
+* text=auto eol=lf
+
+# Forzar LF en scripts shell
+*.sh text eol=lf
+*.ps1 text eol=lf
+
+# Binarios - no tocar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
