@@ -7,13 +7,13 @@
   "fase_actual": {
     "numero": 2,
     "nombre": "Design System",
-    "estado": "en_progreso",
+    "estado": "completada",
     "descripcion": "Paleta de colores, tipografia, espaciado, componentes base shadcn/ui, componentes personalizados (Spinner, EmptyState, StatusBadge, PriorityBadge, ConfirmDialog), iconografia, tema global y pagina showcase de verificacion."
   },
   "fases": [
     { "numero": 0, "nombre": "Infraestructura .claude/", "estado": "completada" },
     { "numero": 1, "nombre": "Inicializacion React + Stack", "estado": "completada" },
-    { "numero": 2, "nombre": "Design System", "estado": "en_progreso" },
+    { "numero": 2, "nombre": "Design System", "estado": "completada" },
     { "numero": 3, "nombre": "Layout General (Sidebar, Header, Nav)", "estado": "pendiente" },
     { "numero": 4, "nombre": "Pantallas con Mock Data", "estado": "pendiente" },
     { "numero": 5, "nombre": "Base de Datos (Supabase)", "estado": "pendiente" },
@@ -56,7 +56,7 @@
     "tests_unitarios": 5,
     "tests_e2e": 0
   },
-  "ultimo_commit_estable": "pendiente-commit-fase2",
+  "ultimo_commit_estable": "eecbf16",
   "ultima_actualizacion": "2026-06-29",
   "notas": "project-status.json debe actualizarse despues de cada tarea y cada commit (responsable: documentation-manager)."
 }
