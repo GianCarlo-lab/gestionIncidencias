@@ -53,14 +53,14 @@ export function MyTicketsPage() {
   const handleFilterChange = () => setPage(1)
 
   return (
-    <div className="space-y-3 p-3 lg:p-5">
+    <div className="space-y-3 p-3 lg:p-4">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">
+          <h2 className="text-base font-semibold tracking-tight">
             {isAdmin ? 'Gestión de tickets' : 'Mis tickets'}
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {filtered.length} ticket{filtered.length !== 1 ? 's' : ''} encontrado
             {filtered.length !== 1 ? 's' : ''}
           </p>
@@ -166,7 +166,7 @@ export function MyTicketsPage() {
       ) : (
         <div className="grid gap-2">
           {/* Table header — hidden on mobile */}
-          <div className="hidden grid-cols-[auto_1fr_auto_auto_auto] items-center gap-4 rounded-lg border bg-muted/40 px-4 py-2 text-xs font-medium text-muted-foreground lg:grid">
+          <div className="hidden grid-cols-[auto_1fr_auto_auto_auto] items-center gap-4 rounded-lg border bg-muted/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground lg:grid">
             <span>Código</span>
             <span>Título · Área</span>
             <span className="text-center">Prioridad</span>
@@ -188,7 +188,7 @@ export function MyTicketsPage() {
                       <span className="font-mono text-xs text-muted-foreground">{ticket.code}</span>
                       <PriorityBadge priority={ticket.priority} showIcon />
                     </div>
-                    <p className="mt-1 font-medium leading-snug">{ticket.title}</p>
+                    <p className="mt-1 text-xs font-medium leading-snug">{ticket.title}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {ticket.sucursal} · {ticket.area}
                     </p>

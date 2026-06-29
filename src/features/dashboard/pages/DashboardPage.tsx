@@ -133,13 +133,13 @@ function ChartCard({
 }) {
   return (
     <Card className={cn('border-border/60 bg-card', className)}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+      <CardHeader className="px-3 pb-2 pt-3">
+        <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
           {title}
         </CardTitle>
         {description && <CardDescription className="text-[10px]">{description}</CardDescription>}
       </CardHeader>
-      <CardContent className="pb-4">{children}</CardContent>
+      <CardContent className="p-3 pt-0">{children}</CardContent>
     </Card>
   )
 }
@@ -231,12 +231,12 @@ function WorkerDashboard() {
   const recentTickets = myTickets.slice(0, 5)
 
   return (
-    <div className="space-y-4 p-3 lg:p-5">
+    <div className="space-y-4 p-3 lg:p-4">
       {/* Saludo */}
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Hola, {user?.nombre}</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base font-semibold tracking-tight">Hola, {user?.nombre}</h2>
+          <p className="text-xs text-muted-foreground">
             Aquí tienes el resumen de tus tickets de hoy.
           </p>
         </div>
@@ -284,7 +284,9 @@ function WorkerDashboard() {
       <Card>
         <CardHeader className="flex-row items-center justify-between pb-3">
           <div>
-            <CardTitle className="text-base">Mis tickets recientes</CardTitle>
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Mis tickets recientes
+            </CardTitle>
             <CardDescription>Últimos tickets registrados o asignados</CardDescription>
           </div>
           <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.TICKETS)}>
@@ -851,12 +853,12 @@ function AdminDashboard() {
   ]
 
   return (
-    <div className="space-y-4 p-3 lg:p-5">
+    <div className="space-y-4 p-3 lg:p-4">
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Panel de Administración</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base font-semibold tracking-tight">Panel de Administración</h2>
+          <p className="text-xs text-muted-foreground">
             {new Date().toLocaleDateString('es-PE', {
               weekday: 'long',
               year: 'numeric',
@@ -896,7 +898,7 @@ function AdminDashboard() {
                     <Icon className={cn('h-3 w-3', kpi.color)} />
                   </div>
                 </div>
-                <p className="mt-1.5 text-2xl font-bold tabular-nums">
+                <p className="mt-1.5 text-2xl font-semibold tabular-nums">
                   {kpi.value}
                   {kpi.suffix && (
                     <span className="ml-0.5 text-sm font-normal text-muted-foreground">
@@ -964,7 +966,7 @@ function AdminDashboard() {
               onClick={() => navigate(`${ROUTES.TICKETS}?status=${s.status}`)}
             >
               <Icon className={cn('mb-1 h-3.5 w-3.5', s.color)} />
-              <p className="text-lg font-bold tabular-nums">{s.value}</p>
+              <p className="text-lg font-semibold tabular-nums">{s.value}</p>
               <p className="text-[10px] text-muted-foreground">{s.label}</p>
             </button>
           )
@@ -994,7 +996,9 @@ function AdminDashboard() {
       <Card>
         <CardHeader className="flex-row items-center justify-between pb-3">
           <div>
-            <CardTitle className="text-base">Tickets recientes</CardTitle>
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Tickets recientes
+            </CardTitle>
             <CardDescription>Últimos 5 tickets del sistema</CardDescription>
           </div>
           <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.TICKETS)}>

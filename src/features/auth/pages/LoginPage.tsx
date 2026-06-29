@@ -80,9 +80,9 @@ export function LoginPage() {
     <div className="space-y-5">
       {/* Login card */}
       <Card className="shadow-lg">
-        <CardContent className="p-6">
-          <div className="mb-5">
-            <h2 className="text-lg font-semibold tracking-tight">Iniciar sesión</h2>
+        <CardContent className="p-3 pt-0">
+          <div className="mb-5 pt-3">
+            <h2 className="text-base font-semibold tracking-tight">Iniciar sesión</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               Ingresa tus credenciales para continuar
             </p>

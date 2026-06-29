@@ -163,15 +163,15 @@ export function AuditPage() {
   )
 
   return (
-    <div className="space-y-4 p-3 lg:p-5">
+    <div className="space-y-4 p-3 lg:p-4">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight">
             <Shield className="h-5 w-5 text-primary" />
             Auditoría
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Registro completo de acciones del sistema.
           </p>
         </div>
@@ -190,7 +190,7 @@ export function AuditPage() {
           { label: 'Errores', value: AUDIT_ENTRIES.filter((e) => e.result === 'error').length },
         ].map((stat) => (
           <Card key={stat.label}>
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
               <p className="text-2xl font-bold">{stat.value}</p>
             </CardContent>
@@ -211,8 +211,10 @@ export function AuditPage() {
 
       {/* Log entries */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold">Log de eventos</CardTitle>
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Log de eventos
+          </CardTitle>
           <CardDescription>Últimas 10 acciones del sistema</CardDescription>
         </CardHeader>
         <CardContent className="divide-y p-0">
@@ -231,7 +233,7 @@ export function AuditPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium">{entry.action}</span>
+                    <span className="text-xs font-medium">{entry.action}</span>
                     <Badge
                       variant="outline"
                       className={cn(

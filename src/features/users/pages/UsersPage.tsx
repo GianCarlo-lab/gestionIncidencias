@@ -35,10 +35,10 @@ const ROL_LABELS: Record<UserRole, string> = {
 function UserRow({ user }: { user: MockUser }) {
   return (
     <Card className="transition-all hover:border-primary/30 hover:shadow-sm">
-      <CardContent className="p-3">
+      <CardContent className="p-3 pt-0">
         <div className="flex items-start gap-3">
           {/* Avatar */}
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
             {user.initials}
           </div>
 
@@ -129,12 +129,12 @@ export function UsersPage() {
   }
 
   return (
-    <div className="space-y-4 p-3 lg:p-5">
+    <div className="space-y-4 p-3 lg:p-4">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Gestión de usuarios</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base font-semibold tracking-tight">Gestión de usuarios</h2>
+          <p className="text-xs text-muted-foreground">
             {filtered.length} de {counts.total} usuarios
           </p>
         </div>
@@ -161,7 +161,7 @@ export function UsersPage() {
           },
         ].map((stat) => (
           <Card key={stat.label}>
-            <CardContent className="p-4">
+            <CardContent className="p-3 pt-0">
               <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
             </CardContent>
@@ -210,7 +210,7 @@ export function UsersPage() {
       {/* Users list */}
       {filtered.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
+          <CardContent className="flex flex-col items-center gap-2 p-3 py-10 pt-0 text-center">
             <Search className="h-8 w-8 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">
               No se encontraron usuarios con esos filtros.
@@ -228,11 +228,13 @@ export function UsersPage() {
       {/* Sucursales y áreas — admin view */}
       <div className="grid gap-3 pt-2 lg:grid-cols-2">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Sucursales</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Sucursales
+            </CardTitle>
             <CardDescription>Gestionar sedes de la empresa</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 p-3 pt-0">
             {MOCK_SUCURSALES.map((s) => (
               <div
                 key={s.id}
@@ -253,11 +255,13 @@ export function UsersPage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Áreas — Sede Central</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Áreas — Sede Central
+            </CardTitle>
             <CardDescription>Gestionar departamentos</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 p-3 pt-0">
             {[
               { name: 'Sistemas / TI', count: 2 },
               { name: 'Recursos Humanos', count: 1 },

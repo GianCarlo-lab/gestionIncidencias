@@ -96,20 +96,20 @@ export function ProfilePage() {
     : '??'
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-5">
+    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-4">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">Mi perfil</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-base font-semibold tracking-tight">Mi perfil</h2>
+        <p className="text-xs text-muted-foreground">
           Gestiona tu información personal y preferencias.
         </p>
       </div>
 
       {/* Avatar section */}
       <Card>
-        <CardContent className="flex items-center gap-4 p-4">
+        <CardContent className="flex items-center gap-4 p-3">
           <div className="relative">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">
               {initials}
             </div>
             <button className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90">
@@ -117,10 +117,10 @@ export function ProfilePage() {
             </button>
           </div>
           <div>
-            <p className="text-lg font-bold">
+            <p className="text-xs font-medium">
               {user?.nombre} {user?.apellido}
             </p>
-            <p className="text-sm text-muted-foreground">{user?.correo}</p>
+            <p className="text-xs text-muted-foreground">{user?.correo}</p>
             <div className="mt-1 flex items-center gap-2">
               {user?.rol && (
                 <Badge variant="secondary" className="text-xs">
@@ -137,10 +137,12 @@ export function ProfilePage() {
 
       {/* Profile form */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold">Datos personales</CardTitle>
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Datos personales
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0">
           <form onSubmit={handleProfile(onSaveProfile)} className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
@@ -186,24 +188,24 @@ export function ProfilePage() {
 
             {/* Read-only info */}
             <Separator />
-            <div className="grid gap-3 text-sm sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Sucursal
                 </p>
-                <p className="font-medium">Sede Central</p>
+                <p className="text-xs font-medium">Sede Central</p>
               </div>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Área
                 </p>
-                <p className="font-medium">Sistemas / TI</p>
+                <p className="text-xs font-medium">Sistemas / TI</p>
               </div>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Usuario
                 </p>
-                <p className="font-medium">{user?.usuario ?? 'N/A'}</p>
+                <p className="text-xs font-medium">{user?.usuario ?? 'N/A'}</p>
               </div>
             </div>
 
@@ -233,14 +235,14 @@ export function ProfilePage() {
 
       {/* Password */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Lock className="h-4 w-4" />
             Cambiar contraseña
           </CardTitle>
           <CardDescription>Tu contraseña debe tener al menos 8 caracteres.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0">
           <form onSubmit={handlePw(onSavePw)} className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="actual" className="text-xs">
@@ -292,13 +294,13 @@ export function ProfilePage() {
 
       {/* Preferences */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Bell className="h-4 w-4" />
             Notificaciones
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           {[
             {
               id: 'email',
@@ -328,7 +330,7 @@ export function ProfilePage() {
           ].map((pref) => (
             <div key={pref.id} className="flex items-center justify-between gap-4">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{pref.label}</p>
+                <p className="text-xs font-medium">{pref.label}</p>
                 <p className="text-xs text-muted-foreground">{pref.description}</p>
               </div>
               <Switch
@@ -342,18 +344,18 @@ export function ProfilePage() {
 
       {/* App preferences */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Globe className="h-4 w-4" />
             Apariencia
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Moon className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm font-medium">Modo oscuro</p>
+                <p className="text-xs font-medium">Modo oscuro</p>
                 <p className="text-xs text-muted-foreground">Cambia el tema de la aplicación</p>
               </div>
             </div>

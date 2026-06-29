@@ -12,13 +12,13 @@ export function AuthLayout() {
               <Ticket className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Pide Servicio</h1>
-              <p className="text-sm text-primary-foreground/70">
+              <h1 className="text-xl font-bold tracking-tight">Pide Servicio</h1>
+              <p className="text-xs text-primary-foreground/70">
                 Sistema de gestión de incidencias
               </p>
             </div>
           </div>
-          <p className="text-sm leading-relaxed text-primary-foreground/90">
+          <p className="text-xs leading-relaxed text-primary-foreground/90">
             Registra, asigna y resuelve solicitudes de servicio en un solo lugar. Trazabilidad
             completa, en tiempo real.
           </p>

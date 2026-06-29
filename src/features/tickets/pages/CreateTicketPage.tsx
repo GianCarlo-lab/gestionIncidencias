@@ -85,7 +85,7 @@ export function CreateTicketPage() {
           <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
         </div>
         <div>
-          <h3 className="text-lg font-bold">Ticket creado exitosamente</h3>
+          <h3 className="text-base font-semibold">Ticket creado exitosamente</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Tu solicitud fue registrada y será asignada en breve.
           </p>
@@ -109,20 +109,22 @@ export function CreateTicketPage() {
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Nuevo ticket</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base font-semibold tracking-tight">Nuevo ticket</h2>
+          <p className="text-xs text-muted-foreground">
             Describe tu solicitud o incidencia con el mayor detalle posible.
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         {/* Tipo y prioridad */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Clasificación</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Clasificación
+            </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="grid gap-3 p-3 pt-0 sm:grid-cols-2">
             {/* Tipo */}
             <div className="space-y-1.5">
               <Label htmlFor="type" className="text-xs font-medium">
@@ -181,10 +183,12 @@ export function CreateTicketPage() {
 
         {/* Ubicación */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Ubicación</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Ubicación
+            </CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="grid gap-3 p-3 pt-0 sm:grid-cols-2">
             {/* Sucursal */}
             <div className="space-y-1.5">
               <Label htmlFor="sucursalId" className="text-xs font-medium">
@@ -265,10 +269,12 @@ export function CreateTicketPage() {
 
         {/* Descripción */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Detalle de la solicitud</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Detalle de la solicitud
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 p-3 pt-0">
             <div className="space-y-1.5">
               <Label htmlFor="title" className="text-xs font-medium">
                 Título
@@ -300,11 +306,15 @@ export function CreateTicketPage() {
 
         {/* Evidencias */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Evidencias</CardTitle>
-            <CardDescription>Adjunta fotos, capturas de pantalla o documentos.</CardDescription>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Evidencias
+            </CardTitle>
+            <CardDescription className="text-[11px] text-muted-foreground">
+              Adjunta fotos, capturas de pantalla o documentos.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 p-3 pt-0">
             {files.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {files.map((f, i) => (
@@ -327,12 +337,12 @@ export function CreateTicketPage() {
             <button
               type="button"
               onClick={addFakeFile}
-              className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-6 py-6 transition-colors hover:border-primary/50 hover:bg-muted/50"
+              className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border px-4 py-4 transition-colors hover:border-primary/50 hover:bg-muted/50"
             >
-              <Upload className="h-6 w-6 text-muted-foreground" />
+              <Upload className="h-5 w-5 text-muted-foreground" />
               <div className="text-center">
-                <p className="text-sm font-medium">Haz clic para adjuntar archivo</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs font-medium">Haz clic para adjuntar archivo</p>
+                <p className="text-[11px] text-muted-foreground">
                   PNG, JPG, PDF, MP4 · máx. 10 MB por archivo
                 </p>
               </div>

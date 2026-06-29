@@ -83,7 +83,7 @@ function NotificationItem({
       {/* Content */}
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-start justify-between gap-2">
-          <p className={cn('text-sm font-medium', !notification.read && 'font-semibold')}>
+          <p className={cn('text-xs font-medium', !notification.read && 'font-semibold')}>
             {notification.title}
           </p>
           <span className="shrink-0 whitespace-nowrap text-[11px] text-muted-foreground">
@@ -122,13 +122,13 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-5">
+    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Notificaciones</h2>
+          <h2 className="text-base font-semibold tracking-tight">Notificaciones</h2>
           {unreadCount > 0 && (
-            <p className="text-sm text-muted-foreground">{unreadCount} sin leer</p>
+            <p className="text-xs text-muted-foreground">{unreadCount} sin leer</p>
           )}
         </div>
         {unreadCount > 0 && (
@@ -152,7 +152,7 @@ export function NotificationsPage() {
             key={tab.id}
             onClick={() => setFilter(tab.id)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all',
               filter === tab.id
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',

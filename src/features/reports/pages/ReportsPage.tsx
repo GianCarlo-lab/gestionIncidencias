@@ -78,8 +78,8 @@ export function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Reportes</h2>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-base font-semibold tracking-tight">Reportes</h1>
+          <p className="text-xs text-muted-foreground">
             Análisis y métricas del sistema de tickets.
           </p>
         </div>
@@ -93,11 +93,13 @@ export function ReportsPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Bar chart by sucursal */}
         <Card className="lg:col-span-2">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Tickets por sucursal</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Tickets por sucursal
+            </CardTitle>
             <CardDescription>Comparativo resueltos vs. pendientes</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 pt-0">
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={bySucursal} margin={{ left: -20, right: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -137,11 +139,13 @@ export function ReportsPage() {
 
         {/* Pie chart by priority */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">Por prioridad</CardTitle>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Por prioridad
+            </CardTitle>
             <CardDescription>Distribución total</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center">
+          <CardContent className="flex flex-col items-center p-3 pt-0">
             <ResponsiveContainer width="100%" height={160}>
               <PieChart>
                 <Pie
@@ -184,11 +188,13 @@ export function ReportsPage() {
 
       {/* Bar chart by type */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold">Tickets por tipo de solicitud</CardTitle>
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Tickets por tipo de solicitud
+          </CardTitle>
           <CardDescription>Histograma de categorías más frecuentes</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0">
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={byType} layout="vertical" margin={{ left: 80, right: 16 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} className="stroke-border" />
@@ -223,20 +229,22 @@ export function ReportsPage() {
 
       {/* Available reports */}
       <div>
-        <h3 className="mb-3 font-semibold">Reportes disponibles</h3>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          Reportes disponibles
+        </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {AVAILABLE_REPORTS.map((report) => (
             <Card
               key={report.title}
               className="cursor-pointer transition-all hover:border-primary/30 hover:shadow-md"
             >
-              <CardContent className="flex items-start gap-3 p-4">
+              <CardContent className="flex items-start gap-3 p-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <report.icon className="h-4 w-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{report.title}</p>
+                    <p className="text-xs font-medium">{report.title}</p>
                     <Badge variant="secondary" className="text-[10px]">
                       {report.badge}
                     </Badge>

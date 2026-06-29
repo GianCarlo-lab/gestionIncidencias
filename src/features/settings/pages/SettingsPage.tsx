@@ -12,31 +12,35 @@ export function SettingsPage() {
   const [maxFileSize, setMaxFileSize] = useState('10')
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 lg:p-5">
+    <div className="mx-auto max-w-2xl space-y-3 p-3 lg:p-4">
       {/* Header */}
       <div>
-        <h2 className="flex items-center gap-2 text-base font-semibold">
+        <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight">
           <Settings className="h-5 w-5" />
           Configuración
         </h2>
-        <p className="text-sm text-muted-foreground">Ajustes globales del sistema Pide Servicio.</p>
+        <p className="text-xs text-muted-foreground">Ajustes globales del sistema Pide Servicio.</p>
       </div>
 
       {/* General settings */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Building2 className="h-4 w-4" />
             General
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           <div className="space-y-2">
-            <Label htmlFor="empresa">Nombre de la empresa</Label>
+            <Label htmlFor="empresa" className="text-xs font-medium">
+              Nombre de la empresa
+            </Label>
             <Input id="empresa" defaultValue="Empresa Demo S.A.C." />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="zona">Zona horaria</Label>
+            <Label htmlFor="zona" className="text-xs font-medium">
+              Zona horaria
+            </Label>
             <Select defaultValue="America/Lima">
               <SelectTrigger id="zona">
                 <SelectValue />
@@ -50,7 +54,7 @@ export function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Modo de mantenimiento</p>
+              <p className="text-xs font-medium">Modo de mantenimiento</p>
               <p className="text-xs text-muted-foreground">
                 Bloquea el acceso a todos los usuarios excepto superadmin
               </p>
@@ -62,15 +66,17 @@ export function SettingsPage() {
 
       {/* Security */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Shield className="h-4 w-4" />
             Seguridad y sesiones
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           <div className="space-y-2">
-            <Label htmlFor="session">Tiempo de sesión (minutos)</Label>
+            <Label htmlFor="session" className="text-xs font-medium">
+              Tiempo de sesión (minutos)
+            </Label>
             <Select value={sessionTimeout} onValueChange={setSessionTimeout}>
               <SelectTrigger id="session">
                 <Clock className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
@@ -87,14 +93,14 @@ export function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Autenticación de dos factores</p>
+              <p className="text-xs font-medium">Autenticación de dos factores</p>
               <p className="text-xs text-muted-foreground">Requerir 2FA para administradores</p>
             </div>
             <Switch />
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Bloqueo por intentos fallidos</p>
+              <p className="text-xs font-medium">Bloqueo por intentos fallidos</p>
               <p className="text-xs text-muted-foreground">
                 Bloquear cuenta tras 5 intentos fallidos
               </p>
@@ -106,15 +112,17 @@ export function SettingsPage() {
 
       {/* Tickets */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Ticket className="h-4 w-4" />
             Configuración de tickets
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           <div className="space-y-2">
-            <Label htmlFor="filesize">Tamaño máximo de archivo adjunto (MB)</Label>
+            <Label htmlFor="filesize" className="text-xs font-medium">
+              Tamaño máximo de archivo adjunto (MB)
+            </Label>
             <Select value={maxFileSize} onValueChange={setMaxFileSize}>
               <SelectTrigger id="filesize">
                 <SelectValue />
@@ -130,7 +138,7 @@ export function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Asignación automática</p>
+              <p className="text-xs font-medium">Asignación automática</p>
               <p className="text-xs text-muted-foreground">
                 Asignar tickets automáticamente al trabajador disponible del área
               </p>
@@ -139,7 +147,7 @@ export function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Permitir reapertura de tickets</p>
+              <p className="text-xs font-medium">Permitir reapertura de tickets</p>
               <p className="text-xs text-muted-foreground">
                 Los usuarios pueden reabrir tickets cerrados dentro de 7 días
               </p>
@@ -148,7 +156,7 @@ export function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">SLA por prioridad</p>
+              <p className="text-xs font-medium">SLA por prioridad</p>
               <p className="text-xs text-muted-foreground">
                 Alertas de vencimiento según prioridad
               </p>
@@ -162,13 +170,13 @@ export function SettingsPage() {
 
       {/* Notifications global */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+        <CardHeader className="px-3 pb-2 pt-3">
+          <CardTitle className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <Bell className="h-4 w-4" />
             Notificaciones del sistema
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 p-3 pt-0">
           {[
             {
               label: 'Notificaciones por correo',
@@ -193,7 +201,7 @@ export function SettingsPage() {
           ].map((setting) => (
             <div key={setting.label} className="flex items-center justify-between gap-4">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">{setting.label}</p>
+                <p className="text-xs font-medium">{setting.label}</p>
                 <p className="text-xs text-muted-foreground">{setting.description}</p>
               </div>
               <Switch defaultChecked={setting.checked} />
@@ -204,11 +212,13 @@ export function SettingsPage() {
 
       {/* Danger zone */}
       <Card className="border-destructive/50">
-        <CardHeader className="bg-destructive/5 pb-3">
-          <CardTitle className="text-sm font-semibold text-destructive">Zona de peligro</CardTitle>
+        <CardHeader className="bg-destructive/5 px-3 pb-2 pt-3">
+          <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-destructive">
+            Zona de peligro
+          </CardTitle>
           <CardDescription>Estas acciones son irreversibles.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-2 p-3 pt-0">
           {[
             {
               label: 'Limpiar logs de auditoría',
@@ -224,7 +234,7 @@ export function SettingsPage() {
               className="flex w-full items-center justify-between rounded-lg border border-destructive/20 px-4 py-3 text-left transition-colors hover:bg-destructive/5"
             >
               <div>
-                <p className="text-sm font-medium">{action.label}</p>
+                <p className="text-xs font-medium">{action.label}</p>
                 <p className="text-xs text-muted-foreground">{action.description}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />

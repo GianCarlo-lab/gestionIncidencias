@@ -195,7 +195,7 @@ export function TicketDetailPage() {
             <PriorityBadge priority={ticket.priority} />
             <StatusBadge status={ticket.status} />
           </div>
-          <h2 className="mt-1 text-lg font-semibold leading-snug">{ticket.title}</h2>
+          <h2 className="mt-1 text-base font-semibold leading-snug">{ticket.title}</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Creado el {createdDate} por{' '}
             <span className="font-medium">{ticket.createdBy.fullName}</span> · Última actualización:{' '}
@@ -209,11 +209,13 @@ export function TicketDetailPage() {
         <div className="space-y-4 lg:col-span-2">
           {/* Description */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Descripción</CardTitle>
+            <CardHeader className="px-3 pb-2 pt-3">
+              <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Descripción
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+            <CardContent className="p-3 pt-0">
+              <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/90">
                 {ticket.description}
               </p>
             </CardContent>
@@ -228,7 +230,7 @@ export function TicketDetailPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors',
+                    'flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors',
                     activeTab === tab.id
                       ? 'border-b-2 border-primary text-primary'
                       : 'text-muted-foreground hover:text-foreground',
@@ -244,7 +246,7 @@ export function TicketDetailPage() {
               ))}
             </div>
 
-            <CardContent className="pt-3">
+            <CardContent className="p-3">
               {/* Comments tab */}
               {activeTab === 'comments' && (
                 <div className="space-y-3">
@@ -283,7 +285,7 @@ export function TicketDetailPage() {
                         />
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pl-10">
+                    <div className="flex items-center justify-between">
                       {isAdmin && (
                         <button
                           type="button"
@@ -342,10 +344,12 @@ export function TicketDetailPage() {
         <div className="space-y-4">
           {/* Info card */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Información</CardTitle>
+            <CardHeader className="px-3 pb-2 pt-3">
+              <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Información
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm">
+            <CardContent className="space-y-3 p-3 pt-0 text-sm">
               {[
                 { label: 'Tipo', value: ticket.type },
                 { label: 'Sucursal', value: ticket.sucursal },
@@ -368,10 +372,12 @@ export function TicketDetailPage() {
 
           {/* Actions */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Acciones</CardTitle>
+            <CardHeader className="px-3 pb-2 pt-3">
+              <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Acciones
+              </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
+            <CardContent className="flex flex-col gap-2 p-3 pt-0">
               {/* Worker: validate / admin: assign */}
               {ticket.status === 'pendiente_validacion' && (
                 <Button className="w-full" onClick={() => setCloseDialog(true)}>

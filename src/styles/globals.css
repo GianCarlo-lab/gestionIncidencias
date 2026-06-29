@@ -108,6 +108,8 @@
       'calt' 1;
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   h1 {
@@ -130,8 +132,8 @@
   }
 
   ::placeholder {
-    @apply text-muted-foreground/60;
-    font-size: 0.8125rem;
+    font-size: 0.6875rem !important; /* 11px — más pequeño que el input */
+    color: hsl(var(--muted-foreground) / 0.5) !important;
   }
 
   input,
@@ -172,5 +174,37 @@
   }
   .chart-grid line {
     stroke: hsl(var(--border)) !important;
+  }
+
+  /* ─── Escala tipográfica canónica ────────────────────────────────────── */
+  .ps-page-title {
+    @apply text-base font-semibold tracking-tight;
+  }
+  .ps-card-label {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-muted-foreground;
+  }
+  .ps-body {
+    @apply text-sm;
+  }
+  .ps-meta {
+    @apply text-[11px] text-muted-foreground;
+  }
+  .ps-label {
+    @apply text-xs font-medium;
+  }
+  .ps-badge-text {
+    @apply text-[10px] font-medium;
+  }
+  .ps-table-header {
+    @apply text-[10px] font-semibold uppercase tracking-wide text-muted-foreground;
+  }
+  .ps-table-cell {
+    @apply text-xs;
+  }
+  .ps-nav-item {
+    @apply text-xs font-medium;
+  }
+  .ps-mono {
+    @apply font-mono text-xs text-muted-foreground;
   }
 }
