@@ -46,11 +46,13 @@ export function MyTicketsPage() {
   const handleFilterChange = () => setPage(1)
 
   return (
-    <div className="space-y-4 p-4 lg:p-6">
+    <div className="space-y-3 p-3 lg:p-5">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold">{isAdmin ? 'Gestión de tickets' : 'Mis tickets'}</h2>
+          <h2 className="text-lg font-semibold tracking-tight">
+            {isAdmin ? 'Gestión de tickets' : 'Mis tickets'}
+          </h2>
           <p className="text-sm text-muted-foreground">
             {filtered.length} ticket{filtered.length !== 1 ? 's' : ''} encontrado
             {filtered.length !== 1 ? 's' : ''}
@@ -63,12 +65,12 @@ export function MyTicketsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-1.5 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por título, código o área..."
-            className="pl-9"
+            className="h-8 pl-9 text-xs"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -83,7 +85,7 @@ export function MyTicketsPage() {
             handleFilterChange()
           }}
         >
-          <SelectTrigger className="w-full sm:w-44">
+          <SelectTrigger className="h-8 w-full text-xs sm:w-44">
             <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
@@ -104,7 +106,7 @@ export function MyTicketsPage() {
             handleFilterChange()
           }}
         >
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="h-8 w-full text-xs sm:w-40">
             <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
             <SelectValue placeholder="Prioridad" />
           </SelectTrigger>
@@ -154,14 +156,12 @@ export function MyTicketsPage() {
               className="cursor-pointer transition-all hover:border-primary/30 hover:shadow-md"
               onClick={() => navigate(ticketDetailPath(ticket.id))}
             >
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 {/* Mobile layout */}
                 <div className="flex items-start gap-3 lg:hidden">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[11px] text-muted-foreground">
-                        {ticket.code}
-                      </span>
+                      <span className="font-mono text-xs text-muted-foreground">{ticket.code}</span>
                       <PriorityBadge priority={ticket.priority} showIcon />
                     </div>
                     <p className="mt-1 font-medium leading-snug">{ticket.title}</p>
@@ -193,7 +193,7 @@ export function MyTicketsPage() {
                   <div className="text-right">
                     {ticket.assignedTo ? (
                       <div className="flex items-center justify-end gap-1.5">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-[9px] font-bold text-primary">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
                           {ticket.assignedTo.initials}
                         </div>
                         <span className="max-w-24 truncate text-xs">
@@ -201,7 +201,7 @@ export function MyTicketsPage() {
                         </span>
                       </div>
                     ) : (
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-xs">
                         Sin asignar
                       </Badge>
                     )}
@@ -219,11 +219,11 @@ export function MyTicketsPage() {
           <p className="text-xs text-muted-foreground">
             Página {page} de {totalPages} · {filtered.length} resultados
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9"
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
             >
@@ -232,7 +232,7 @@ export function MyTicketsPage() {
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-9 w-9"
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
             >

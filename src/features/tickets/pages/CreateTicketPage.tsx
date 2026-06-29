@@ -102,14 +102,14 @@ export function CreateTicketPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-4 lg:p-6">
+    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(-1)}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="text-xl font-bold">Nuevo ticket</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Nuevo ticket</h2>
           <p className="text-sm text-muted-foreground">
             Describe tu solicitud o incidencia con el mayor detalle posible.
           </p>
@@ -122,10 +122,12 @@ export function CreateTicketPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Clasificación</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <CardContent className="grid gap-3 sm:grid-cols-2">
             {/* Tipo */}
-            <div className="space-y-2">
-              <Label htmlFor="type">Tipo de solicitud</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="type" className="text-xs font-medium">
+                Tipo de solicitud
+              </Label>
               <Controller
                 control={control}
                 name="type"
@@ -148,8 +150,10 @@ export function CreateTicketPage() {
             </div>
 
             {/* Prioridad */}
-            <div className="space-y-2">
-              <Label htmlFor="priority">Prioridad</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="priority" className="text-xs font-medium">
+                Prioridad
+              </Label>
               <Controller
                 control={control}
                 name="priority"
@@ -163,7 +167,7 @@ export function CreateTicketPage() {
                         <SelectItem key={p.value} value={p.value}>
                           <div>
                             <p className="font-medium">{p.label}</p>
-                            <p className="text-[11px] text-muted-foreground">{p.description}</p>
+                            <p className="text-xs text-muted-foreground">{p.description}</p>
                           </div>
                         </SelectItem>
                       ))}
@@ -180,10 +184,12 @@ export function CreateTicketPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Ubicación</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+          <CardContent className="grid gap-3 sm:grid-cols-2">
             {/* Sucursal */}
-            <div className="space-y-2">
-              <Label htmlFor="sucursalId">Sucursal</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="sucursalId" className="text-xs font-medium">
+                Sucursal
+              </Label>
               <Controller
                 control={control}
                 name="sucursalId"
@@ -208,8 +214,10 @@ export function CreateTicketPage() {
             </div>
 
             {/* Área */}
-            <div className="space-y-2">
-              <Label htmlFor="areaId">Área</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="areaId" className="text-xs font-medium">
+                Área
+              </Label>
               <Controller
                 control={control}
                 name="areaId"
@@ -240,8 +248,8 @@ export function CreateTicketPage() {
             </div>
 
             {/* Ubicación específica */}
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="location" className="flex items-center gap-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="location" className="flex items-center gap-1.5 text-xs font-medium">
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                 Ubicación específica{' '}
                 <span className="text-xs font-normal text-muted-foreground">(opcional)</span>
@@ -260,9 +268,11 @@ export function CreateTicketPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Detalle de la solicitud</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Título</Label>
+          <CardContent className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-xs font-medium">
+                Título
+              </Label>
               <Input
                 id="title"
                 placeholder="Describe brevemente el problema o solicitud..."
@@ -270,8 +280,10 @@ export function CreateTicketPage() {
               />
               {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción completa</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="description" className="text-xs font-medium">
+                Descripción completa
+              </Label>
               <Textarea
                 id="description"
                 rows={5}
@@ -315,7 +327,7 @@ export function CreateTicketPage() {
             <button
               type="button"
               onClick={addFakeFile}
-              className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-6 py-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
+              className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-6 py-6 transition-colors hover:border-primary/50 hover:bg-muted/50"
             >
               <Upload className="h-6 w-6 text-muted-foreground" />
               <div className="text-center">

@@ -20,7 +20,7 @@ export function MobileNav() {
     { label: 'Inicio', to: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { label: 'Tickets', to: ROUTES.TICKETS, icon: Ticket },
     { label: 'Nuevo', to: ROUTES.TICKETS_NEW, icon: Plus, isAction: true },
-    { label: 'Alertas', to: ROUTES.NOTIFICATIONS, icon: Bell },
+    { label: 'Notificaciones', to: ROUTES.NOTIFICATIONS, icon: Bell },
     { label: 'Perfil', to: ROUTES.PROFILE, icon: User },
   ]
 
@@ -52,7 +52,7 @@ export function MobileNav() {
           <NavLink
             key={item.to}
             to={item.to}
-            className="flex flex-col items-center gap-0.5 px-3 py-1"
+            className="flex flex-col items-center gap-0.5 px-3 py-2"
           >
             <div className="relative">
               <item.icon

@@ -2,7 +2,6 @@ import { Settings, Bell, Shield, Clock, Ticket, Building2, ChevronRight } from '
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/ui/card'
 import { Switch } from '@shared/ui/switch'
 import { Button } from '@shared/ui/button'
-import { Badge } from '@shared/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { Label } from '@shared/ui/label'
 import { Input } from '@shared/ui/input'
@@ -13,10 +12,10 @@ export function SettingsPage() {
   const [maxFileSize, setMaxFileSize] = useState('10')
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-4 lg:p-6">
+    <div className="mx-auto max-w-2xl space-y-3 p-3 lg:p-5">
       {/* Header */}
       <div>
-        <h2 className="flex items-center gap-2 text-xl font-bold">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
           <Settings className="h-5 w-5" />
           Configuración
         </h2>
@@ -31,7 +30,7 @@ export function SettingsPage() {
             General
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="empresa">Nombre de la empresa</Label>
             <Input id="empresa" defaultValue="Empresa Demo S.A.C." />
@@ -69,7 +68,7 @@ export function SettingsPage() {
             Seguridad y sesiones
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="session">Tiempo de sesión (minutos)</Label>
             <Select value={sessionTimeout} onValueChange={setSessionTimeout}>
@@ -113,7 +112,7 @@ export function SettingsPage() {
             Configuración de tickets
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="filesize">Tamaño máximo de archivo adjunto (MB)</Label>
             <Select value={maxFileSize} onValueChange={setMaxFileSize}>
@@ -154,9 +153,9 @@ export function SettingsPage() {
                 Alertas de vencimiento según prioridad
               </p>
             </div>
-            <Badge variant="outline" className="text-xs">
+            <Button variant="ghost" size="sm" className="h-7 text-xs">
               Configurar
-            </Badge>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -204,8 +203,8 @@ export function SettingsPage() {
       </Card>
 
       {/* Danger zone */}
-      <Card className="border-destructive/30">
-        <CardHeader className="pb-3">
+      <Card className="border-destructive/50">
+        <CardHeader className="bg-destructive/5 pb-3">
           <CardTitle className="text-sm font-semibold text-destructive">Zona de peligro</CardTitle>
           <CardDescription>Estas acciones son irreversibles.</CardDescription>
         </CardHeader>

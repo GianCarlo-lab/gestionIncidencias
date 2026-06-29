@@ -35,7 +35,7 @@ const ROL_LABELS: Record<UserRole, string> = {
 function UserRow({ user }: { user: MockUser }) {
   return (
     <Card className="transition-all hover:border-primary/30 hover:shadow-sm">
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">
@@ -129,11 +129,11 @@ export function UsersPage() {
   }
 
   return (
-    <div className="space-y-4 p-4 lg:p-6">
+    <div className="space-y-4 p-3 lg:p-5">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold">Gestión de usuarios</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Gestión de usuarios</h2>
           <p className="text-sm text-muted-foreground">
             {filtered.length} de {counts.total} usuarios
           </p>
@@ -145,7 +145,7 @@ export function UsersPage() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {[
           { label: 'Total', value: counts.total, color: '' },
           { label: 'Activos', value: counts.activos, color: 'text-green-600 dark:text-green-400' },
@@ -170,18 +170,18 @@ export function UsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-1.5 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar por nombre, correo o área..."
-            className="pl-9"
+            className="h-8 pl-9 text-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <Select value={rolFilter} onValueChange={(v) => setRolFilter(v as UserRole | 'all')}>
-          <SelectTrigger className="w-full sm:w-44">
+          <SelectTrigger className="h-8 w-full text-xs sm:w-44">
             <SelectValue placeholder="Rol" />
           </SelectTrigger>
           <SelectContent>
@@ -193,7 +193,7 @@ export function UsersPage() {
           </SelectContent>
         </Select>
         <Select value={sucursalFilter} onValueChange={setSucursalFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="h-8 w-full text-xs sm:w-48">
             <SelectValue placeholder="Sucursal" />
           </SelectTrigger>
           <SelectContent>
@@ -226,7 +226,7 @@ export function UsersPage() {
       )}
 
       {/* Sucursales y áreas — admin view */}
-      <div className="grid gap-4 pt-2 lg:grid-cols-2">
+      <div className="grid gap-3 pt-2 lg:grid-cols-2">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">Sucursales</CardTitle>

@@ -8,7 +8,6 @@ import {
   FileBarChart,
   Shield,
   Plus,
-  ChevronRight,
 } from 'lucide-react'
 import { cn } from '@lib/utils'
 import { ROUTES } from '@constants/index'
@@ -52,7 +51,7 @@ function NavItemRow({ item, unread }: { item: NavItem; unread: number }) {
     <NavLink
       to={item.to}
       className={cn(
-        'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+        'group flex items-center gap-3 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all',
         isActive
           ? 'bg-primary text-primary-foreground shadow-sm'
           : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
@@ -70,7 +69,6 @@ function NavItemRow({ item, unread }: { item: NavItem; unread: number }) {
           {unread > 9 ? '9+' : unread}
         </Badge>
       )}
-      {isActive && !item.badge && <ChevronRight className="h-3 w-3 opacity-60" />}
     </NavLink>
   )
 }
@@ -88,10 +86,9 @@ export function AppSidebar() {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
           <Ticket className="h-4 w-4 text-primary-foreground" />
         </div>
-        <div className="flex flex-col leading-none">
-          <span className="text-sidebar-foreground text-sm font-bold tracking-tight">Pide</span>
-          <span className="text-xs font-semibold text-primary">Servicio</span>
-        </div>
+        <span className="text-sidebar-foreground text-sm font-bold tracking-tight">
+          Pide Servicio
+        </span>
       </div>
 
       {/* Navigation */}
@@ -106,7 +103,7 @@ export function AppSidebar() {
         <div className="mt-6 border-t pt-4">
           <NavLink
             to={ROUTES.TICKETS_NEW}
-            className="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground"
+            className="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary/20"
           >
             <Plus className="h-4 w-4 shrink-0" />
             <span>Nuevo ticket</span>
@@ -119,7 +116,7 @@ export function AppSidebar() {
         <div className="shrink-0 border-t p-3">
           <NavLink
             to={ROUTES.PROFILE}
-            className="hover:bg-sidebar-accent flex items-center gap-3 rounded-lg px-2 py-2 transition-all"
+            className="hover:bg-sidebar-accent flex items-center gap-3 rounded-lg px-2 py-1.5 transition-all"
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
               {user.nombre.charAt(0)}
@@ -129,7 +126,7 @@ export function AppSidebar() {
               <p className="text-sidebar-foreground truncate text-xs font-semibold">
                 {user.nombre} {user.apellido}
               </p>
-              <p className="truncate text-[10px] capitalize text-muted-foreground">{user.rol}</p>
+              <p className="truncate text-xs capitalize text-muted-foreground">{user.rol}</p>
             </div>
           </NavLink>
         </div>

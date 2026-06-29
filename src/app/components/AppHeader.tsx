@@ -1,4 +1,4 @@
-import { Menu, Bell, ChevronDown, LogOut, User, Settings } from 'lucide-react'
+import { Menu, Bell, LogOut, User, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@shared/ui/button'
 import { Badge } from '@shared/ui/badge'
@@ -44,7 +44,7 @@ export function AppHeader({ onMenuClick, title }: AppHeaderProps) {
             <Menu className="h-5 w-5" />
           </Button>
         )}
-        {title && <h1 className="text-base font-semibold text-foreground lg:text-lg">{title}</h1>}
+        {title && <h1 className="text-sm font-semibold text-foreground">{title}</h1>}
       </div>
 
       {/* Right: notifications + avatar */}
@@ -53,7 +53,7 @@ export function AppHeader({ onMenuClick, title }: AppHeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="relative"
+          className="relative hidden lg:flex"
           onClick={() => navigate(ROUTES.NOTIFICATIONS)}
           aria-label="Notificaciones"
         >
@@ -77,7 +77,6 @@ export function AppHeader({ onMenuClick, title }: AppHeaderProps) {
                 <span className="hidden max-w-24 truncate text-sm font-medium lg:block">
                   {user.nombre}
                 </span>
-                <ChevronDown className="h-3 w-3 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">

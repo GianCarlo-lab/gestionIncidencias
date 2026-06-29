@@ -74,11 +74,11 @@ const AVAILABLE_REPORTS = [
 
 export function ReportsPage() {
   return (
-    <div className="space-y-6 p-4 lg:p-6">
+    <div className="space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-bold">Reportes</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Reportes</h2>
           <p className="text-sm text-muted-foreground">
             Análisis y métricas del sistema de tickets.
           </p>
@@ -98,7 +98,7 @@ export function ReportsPage() {
             <CardDescription>Comparativo resueltos vs. pendientes</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={180}>
               <BarChart data={bySucursal} margin={{ left: -20, right: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis
@@ -189,7 +189,7 @@ export function ReportsPage() {
           <CardDescription>Histograma de categorías más frecuentes</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={byType} layout="vertical" margin={{ left: 80, right: 16 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} className="stroke-border" />
               <XAxis type="number" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />

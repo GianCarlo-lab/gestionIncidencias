@@ -66,8 +66,8 @@ function NotificationItem({
   return (
     <button
       className={cn(
-        'flex w-full items-start gap-3 rounded-xl p-4 text-left transition-all hover:bg-muted/70',
-        !notification.read && 'bg-primary/5 hover:bg-primary/10',
+        'flex w-full items-start gap-3 rounded-none px-3 py-2.5 text-left transition-all hover:bg-muted/70',
+        !notification.read && 'bg-primary/8 hover:bg-primary/12',
       )}
       onClick={() => {
         if (notification.ticketId) onNavigate(notification.ticketId)
@@ -75,9 +75,9 @@ function NotificationItem({
     >
       {/* Icon */}
       <div
-        className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', config.bg)}
+        className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', config.bg)}
       >
-        <Icon className={cn('h-4 w-4', config.color)} />
+        <Icon className={cn('h-3.5 w-3.5', config.color)} />
       </div>
 
       {/* Content */}
@@ -122,11 +122,11 @@ export function NotificationsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-4 lg:p-6">
+    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold">Notificaciones</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Notificaciones</h2>
           {unreadCount > 0 && (
             <p className="text-sm text-muted-foreground">{unreadCount} sin leer</p>
           )}
@@ -152,7 +152,7 @@ export function NotificationsPage() {
             key={tab.id}
             onClick={() => setFilter(tab.id)}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+              'flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium transition-all',
               filter === tab.id
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground',

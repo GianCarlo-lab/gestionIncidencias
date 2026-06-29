@@ -87,11 +87,11 @@ function HistoryEntry({ entry }: { entry: MockHistoryEntry }) {
         </div>
         <div className="mt-1 flex-1 border-l border-dashed border-border" />
       </div>
-      <div className="min-w-0 pb-4">
+      <div className="min-w-0 pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold">{entry.action}</span>
-          <span className="text-[11px] text-muted-foreground">por {entry.author.fullName}</span>
-          <span className="text-[11px] text-muted-foreground">{date}</span>
+          <span className="text-xs text-muted-foreground">por {entry.author.fullName}</span>
+          <span className="text-xs text-muted-foreground">{date}</span>
         </div>
         {entry.fromStatus && entry.toStatus && (
           <div className="mt-1 flex items-center gap-1.5">
@@ -176,7 +176,7 @@ export function TicketDetailPage() {
   })
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 p-4 lg:p-6">
+    <div className="mx-auto max-w-4xl space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div className="flex items-start gap-3">
         <Button
@@ -195,7 +195,7 @@ export function TicketDetailPage() {
             <PriorityBadge priority={ticket.priority} />
             <StatusBadge status={ticket.status} />
           </div>
-          <h2 className="mt-1 text-lg font-bold leading-snug lg:text-xl">{ticket.title}</h2>
+          <h2 className="mt-1 text-lg font-semibold leading-snug">{ticket.title}</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Creado el {createdDate} por{' '}
             <span className="font-medium">{ticket.createdBy.fullName}</span> · Última actualización:{' '}
@@ -244,17 +244,17 @@ export function TicketDetailPage() {
               ))}
             </div>
 
-            <CardContent className="pt-4">
+            <CardContent className="pt-3">
               {/* Comments tab */}
               {activeTab === 'comments' && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {ticket.comments.length === 0 ? (
                     <div className="py-6 text-center">
                       <MessageSquare className="mx-auto h-8 w-8 text-muted-foreground/40" />
                       <p className="mt-2 text-sm text-muted-foreground">Aún no hay comentarios.</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {ticket.comments.map((c) => (
                         <CommentBubble key={c.id} comment={c} />
                       ))}
@@ -264,7 +264,7 @@ export function TicketDetailPage() {
                   <Separator />
 
                   {/* New comment */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
                       {user && (
                         <Avatar
@@ -275,8 +275,9 @@ export function TicketDetailPage() {
                       <div className="flex-1">
                         <Textarea
                           placeholder="Escribe un comentario..."
-                          rows={3}
-                          className="resize-none"
+                          aria-label="Escribe un comentario"
+                          rows={2}
+                          className="resize-none text-sm"
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
                         />
@@ -356,7 +357,7 @@ export function TicketDetailPage() {
                 },
               ].map((row) => (
                 <div key={row.label} className="flex flex-col gap-0.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {row.label}
                   </span>
                   <span className="font-medium">{row.value}</span>

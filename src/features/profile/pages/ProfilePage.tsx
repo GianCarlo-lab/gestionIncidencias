@@ -96,10 +96,10 @@ export function ProfilePage() {
     : '??'
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4 p-4 lg:p-6">
+    <div className="mx-auto max-w-2xl space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold">Mi perfil</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Mi perfil</h2>
         <p className="text-sm text-muted-foreground">
           Gestiona tu información personal y preferencias.
         </p>
@@ -107,7 +107,7 @@ export function ProfilePage() {
 
       {/* Avatar section */}
       <Card>
-        <CardContent className="flex items-center gap-4 p-5">
+        <CardContent className="flex items-center gap-4 p-4">
           <div className="relative">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-xl font-bold text-primary">
               {initials}
@@ -141,36 +141,45 @@ export function ProfilePage() {
           <CardTitle className="text-sm font-semibold">Datos personales</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleProfile(onSaveProfile)} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="nombre">Nombre</Label>
-                <Input id="nombre" {...regProfile('nombre')} />
+          <form onSubmit={handleProfile(onSaveProfile)} className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="nombre" className="text-xs">
+                  Nombre
+                </Label>
+                <Input id="nombre" className="h-9 text-sm" {...regProfile('nombre')} />
                 {profileErrors.nombre && (
                   <p className="text-xs text-destructive">{profileErrors.nombre.message}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="apellido">Apellido</Label>
-                <Input id="apellido" {...regProfile('apellido')} />
+              <div className="space-y-1.5">
+                <Label htmlFor="apellido" className="text-xs">
+                  Apellido
+                </Label>
+                <Input id="apellido" className="h-9 text-sm" {...regProfile('apellido')} />
                 {profileErrors.apellido && (
                   <p className="text-xs text-destructive">{profileErrors.apellido.message}</p>
                 )}
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="correo">Correo electrónico</Label>
-              <Input id="correo" type="email" {...regProfile('correo')} />
+            <div className="space-y-1.5">
+              <Label htmlFor="correo" className="text-xs">
+                Correo electrónico
+              </Label>
+              <Input id="correo" type="email" className="h-9 text-sm" {...regProfile('correo')} />
               {profileErrors.correo && (
                 <p className="text-xs text-destructive">{profileErrors.correo.message}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="telefono">Teléfono</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="telefono" className="text-xs">
+                Teléfono
+              </Label>
               <Input
                 id="telefono"
                 type="tel"
                 placeholder="+51 999 000 000"
+                className="h-9 text-sm"
                 {...regProfile('telefono')}
               />
             </div>
@@ -232,24 +241,35 @@ export function ProfilePage() {
           <CardDescription>Tu contraseña debe tener al menos 8 caracteres.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handlePw(onSavePw)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="actual">Contraseña actual</Label>
-              <Input id="actual" type="password" {...regPw('actual')} />
+          <form onSubmit={handlePw(onSavePw)} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="actual" className="text-xs">
+                Contraseña actual
+              </Label>
+              <Input id="actual" type="password" className="h-9 text-sm" {...regPw('actual')} />
               {pwErrors.actual && (
                 <p className="text-xs text-destructive">{pwErrors.actual.message}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="nueva">Nueva contraseña</Label>
-              <Input id="nueva" type="password" {...regPw('nueva')} />
+            <div className="space-y-1.5">
+              <Label htmlFor="nueva" className="text-xs">
+                Nueva contraseña
+              </Label>
+              <Input id="nueva" type="password" className="h-9 text-sm" {...regPw('nueva')} />
               {pwErrors.nueva && (
                 <p className="text-xs text-destructive">{pwErrors.nueva.message}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmar">Confirmar contraseña</Label>
-              <Input id="confirmar" type="password" {...regPw('confirmar')} />
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmar" className="text-xs">
+                Confirmar contraseña
+              </Label>
+              <Input
+                id="confirmar"
+                type="password"
+                className="h-9 text-sm"
+                {...regPw('confirmar')}
+              />
               {pwErrors.confirmar && (
                 <p className="text-xs text-destructive">{pwErrors.confirmar.message}</p>
               )}
@@ -278,7 +298,7 @@ export function ProfilePage() {
             Notificaciones
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           {[
             {
               id: 'email',
@@ -328,7 +348,7 @@ export function ProfilePage() {
             Apariencia
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Moon className="h-4 w-4 text-muted-foreground" />

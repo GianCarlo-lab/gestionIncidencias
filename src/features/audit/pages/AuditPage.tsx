@@ -163,11 +163,11 @@ export function AuditPage() {
   )
 
   return (
-    <div className="space-y-4 p-4 lg:p-6">
+    <div className="space-y-4 p-3 lg:p-5">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-bold">
+          <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
             <Shield className="h-5 w-5 text-primary" />
             Auditoría
           </h2>
@@ -182,7 +182,7 @@ export function AuditPage() {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {[
           { label: 'Total eventos', value: AUDIT_ENTRIES.length },
           { label: 'Ingresos', value: AUDIT_ENTRIES.filter((e) => e.type === 'login').length },
@@ -200,10 +200,10 @@ export function AuditPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Buscar por acción, usuario o detalle..."
-          className="pl-9"
+          className="h-8 pl-9 text-xs"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -220,7 +220,7 @@ export function AuditPage() {
             const config = TYPE_CONFIG[entry.type]
             const Icon = config.icon
             return (
-              <div key={entry.id} className="flex items-start gap-3 px-4 py-3.5">
+              <div key={entry.id} className="flex items-start gap-3 px-4 py-2.5">
                 <div
                   className={cn(
                     'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg',
