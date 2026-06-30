@@ -82,7 +82,7 @@ interface UserRowProps {
 function UserRow({ user, onView, onEdit, onDelete, onToggleStatus, onResetPw }: UserRowProps) {
   return (
     <Card className="transition-all hover:border-primary/30 hover:shadow-sm">
-      <CardContent className="p-3 pt-0">
+      <CardContent className="p-3">
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
@@ -774,7 +774,7 @@ export function UsersPage() {
           },
         ].map((stat) => (
           <Card key={stat.label}>
-            <CardContent className="p-3 pt-0">
+            <CardContent className="p-3">
               <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
             </CardContent>
