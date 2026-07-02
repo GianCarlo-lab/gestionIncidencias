@@ -162,7 +162,7 @@ export function LoginPage() {
         </CardContent>
       </Card>
 
-      {/* Demo access — outside card, visually secondary */}
+      {/* Demo access — outside card,visually secondary */}
       <div className="space-y-2.5">
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
