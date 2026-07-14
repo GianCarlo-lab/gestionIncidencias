@@ -87,19 +87,19 @@ public static class ServiceCollectionExtensions
 
             opts.AddPolicy("SoloSuperAdmin", p =>
                 p.RequireAuthenticatedUser()
-                 .RequireClaim("rol", "SUPERADMIN"));
+                 .RequireClaim("rol", "superadmin"));
 
             opts.AddPolicy("AdminOSuperior", p =>
                 p.RequireAuthenticatedUser()
-                 .RequireClaim("rol", "SUPERADMIN", "ADMIN"));
+                 .RequireClaim("rol", "superadmin", "admin"));
 
             opts.AddPolicy("SupervisorOSuperior", p =>
                 p.RequireAuthenticatedUser()
-                 .RequireClaim("rol", "SUPERADMIN", "ADMIN", "SUPERVISOR"));
+                 .RequireClaim("rol", "superadmin", "admin", "supervisor"));
 
             opts.AddPolicy("Tecnico", p =>
                 p.RequireAuthenticatedUser()
-                 .RequireClaim("rol", "SUPERADMIN", "ADMIN", "SUPERVISOR", "TECNICO"));
+                 .RequireClaim("rol", "superadmin", "admin", "supervisor", "tecnico"));
         });
 
         // ---------------------------------------------------------------------------
