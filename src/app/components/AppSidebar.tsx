@@ -8,6 +8,8 @@ import {
   FileBarChart,
   Shield,
   Plus,
+  Building2,
+  MapPin,
 } from 'lucide-react'
 import { cn } from '@lib/utils'
 import { ROUTES } from '@constants/index'
@@ -34,6 +36,19 @@ const adminNav: NavItem[] = [
   { label: 'Dashboard', to: ROUTES.DASHBOARD, icon: LayoutDashboard },
   { label: 'Tickets', to: ROUTES.TICKETS, icon: Ticket },
   { label: 'Usuarios', to: ROUTES.USERS, icon: Users },
+  { label: 'Sucursales', to: ROUTES.SUCURSALES, icon: MapPin },
+  { label: 'Notificaciones', to: ROUTES.NOTIFICATIONS, icon: Bell },
+  { label: 'Reportes', to: ROUTES.REPORTS, icon: FileBarChart },
+  { label: 'Auditoría', to: ROUTES.AUDIT, icon: Shield },
+  { label: 'Configuración', to: ROUTES.SETTINGS, icon: Settings },
+]
+
+const superAdminNav: NavItem[] = [
+  { label: 'Dashboard', to: ROUTES.DASHBOARD, icon: LayoutDashboard },
+  { label: 'Tickets', to: ROUTES.TICKETS, icon: Ticket },
+  { label: 'Usuarios', to: ROUTES.USERS, icon: Users },
+  { label: 'Empresas', to: ROUTES.EMPRESAS, icon: Building2 },
+  { label: 'Sucursales', to: ROUTES.SUCURSALES, icon: MapPin },
   { label: 'Notificaciones', to: ROUTES.NOTIFICATIONS, icon: Bell },
   { label: 'Reportes', to: ROUTES.REPORTS, icon: FileBarChart },
   { label: 'Auditoría', to: ROUTES.AUDIT, icon: Shield },
@@ -82,8 +97,9 @@ function NavItemRow({ item, unread }: { item: NavItem; unread: number }) {
 
 export function AppSidebar() {
   const user = useAuthStore((s) => s.user)
-  const isAdmin = user?.rol === 'admin' || user?.rol === 'superadmin'
-  const navItems = isAdmin ? adminNav : workerNav
+  const isSuperAdmin = user?.rol === 'superadmin'
+  const isAdmin = user?.rol === 'admin' || isSuperAdmin
+  const navItems = isSuperAdmin ? superAdminNav : isAdmin ? adminNav : workerNav
   const unreadCount = useNotificationsStore(
     (state) => state.notifications.filter((n) => !n.read).length,
   )

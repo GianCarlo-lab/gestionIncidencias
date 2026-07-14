@@ -57,6 +57,38 @@ const AuditPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@features/settings/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
+const EmpresasPage = lazy(() =>
+  import('@features/empresas/pages/EmpresasPage').then((m) => ({ default: m.EmpresasPage })),
+)
+const EmpresaNewPage = lazy(() =>
+  import('@features/empresas/pages/EmpresaNewPage').then((m) => ({ default: m.EmpresaNewPage })),
+)
+const EmpresaDetailPage = lazy(() =>
+  import('@features/empresas/pages/EmpresaDetailPage').then((m) => ({
+    default: m.EmpresaDetailPage,
+  })),
+)
+const EmpresaEditPage = lazy(() =>
+  import('@features/empresas/pages/EmpresaEditPage').then((m) => ({ default: m.EmpresaEditPage })),
+)
+const SucursalesPage = lazy(() =>
+  import('@features/sucursales/pages/SucursalesPage').then((m) => ({ default: m.SucursalesPage })),
+)
+const SucursalNewPage = lazy(() =>
+  import('@features/sucursales/pages/SucursalNewPage').then((m) => ({
+    default: m.SucursalNewPage,
+  })),
+)
+const SucursalDetailPage = lazy(() =>
+  import('@features/sucursales/pages/SucursalDetailPage').then((m) => ({
+    default: m.SucursalDetailPage,
+  })),
+)
+const SucursalEditPage = lazy(() =>
+  import('@features/sucursales/pages/SucursalEditPage').then((m) => ({
+    default: m.SucursalEditPage,
+  })),
+)
 
 // ── Wrapper de suspense para páginas lazy ─────────────────────────────────────
 
@@ -86,11 +118,17 @@ function RequireGuest() {
   return <Outlet />
 }
 
-// Guard de rol: solo admin y superadmin. Redirige al dashboard si el rol no es suficiente.
-// Debe usarse anidado dentro de RequireAuth para garantizar que el usuario está autenticado.
 function RequireAdminRole() {
   const user = useAuthStore((s) => s.user)
   if (!user || (user.rol !== 'admin' && user.rol !== 'superadmin')) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />
+  }
+  return <Outlet />
+}
+
+function RequireSuperAdminRole() {
+  const user = useAuthStore((s) => s.user)
+  if (!user || user.rol !== 'superadmin') {
     return <Navigate to={ROUTES.DASHBOARD} replace />
   }
   return <Outlet />
@@ -237,6 +275,77 @@ const router = createBrowserRouter([
                 element: (
                   <LazyPage>
                     <SettingsPage />
+                  </LazyPage>
+                ),
+              },
+              // Sucursales — admin y superadmin
+              {
+                path: ROUTES.SUCURSALES,
+                element: (
+                  <LazyPage>
+                    <SucursalesPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.SUCURSALES_NEW,
+                element: (
+                  <LazyPage>
+                    <SucursalNewPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.SUCURSALES_DETAIL,
+                element: (
+                  <LazyPage>
+                    <SucursalDetailPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.SUCURSALES_EDIT,
+                element: (
+                  <LazyPage>
+                    <SucursalEditPage />
+                  </LazyPage>
+                ),
+              },
+            ],
+          },
+          // Empresas — solo superadmin
+          {
+            element: <RequireSuperAdminRole />,
+            children: [
+              {
+                path: ROUTES.EMPRESAS,
+                element: (
+                  <LazyPage>
+                    <EmpresasPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.EMPRESAS_NEW,
+                element: (
+                  <LazyPage>
+                    <EmpresaNewPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.EMPRESAS_DETAIL,
+                element: (
+                  <LazyPage>
+                    <EmpresaDetailPage />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: ROUTES.EMPRESAS_EDIT,
+                element: (
+                  <LazyPage>
+                    <EmpresaEditPage />
                   </LazyPage>
                 ),
               },

@@ -12,6 +12,14 @@ export const ROUTES = {
   USERS_NEW: '/usuarios/nuevo',
   USERS_DETAIL: '/usuarios/:id',
   USERS_EDIT: '/usuarios/:id/editar',
+  EMPRESAS: '/empresas',
+  EMPRESAS_NEW: '/empresas/nueva',
+  EMPRESAS_DETAIL: '/empresas/:id',
+  EMPRESAS_EDIT: '/empresas/:id/editar',
+  SUCURSALES: '/sucursales',
+  SUCURSALES_NEW: '/sucursales/nueva',
+  SUCURSALES_DETAIL: '/sucursales/:id',
+  SUCURSALES_EDIT: '/sucursales/:id/editar',
   WORKERS: '/trabajadores',
   SETTINGS: '/configuracion',
   NOTIFICATIONS: '/notificaciones',
@@ -30,6 +38,22 @@ export function userDetailPath(id: string) {
 
 export function userEditPath(id: string) {
   return '/usuarios/' + id + '/editar'
+}
+
+export function empresaDetailPath(id: string) {
+  return '/empresas/' + id
+}
+
+export function empresaEditPath(id: string) {
+  return '/empresas/' + id + '/editar'
+}
+
+export function sucursalDetailPath(id: string) {
+  return '/sucursales/' + id
+}
+
+export function sucursalEditPath(id: string) {
+  return '/sucursales/' + id + '/editar'
 }
 
 // Paginacion por defecto

@@ -20,20 +20,6 @@ const loginSchema = z.object({
 })
 type LoginForm = z.infer<typeof loginSchema>
 
-const DEMO_CORREOS = {
-  superadmin: import.meta.env.VITE_DEMO_SUPERADMIN_EMAIL as string | undefined,
-  admin: import.meta.env.VITE_DEMO_ADMIN_EMAIL as string | undefined,
-  trabajador: import.meta.env.VITE_DEMO_TRABAJADOR_EMAIL as string | undefined,
-}
-const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined
-const DEMO_DISPONIBLE = Boolean(DEMO_PASSWORD && DEMO_CORREOS.superadmin)
-
-const DEMO_USERS = [
-  { label: 'Trabajador', correo: DEMO_CORREOS.trabajador ?? '' },
-  { label: 'Administrador', correo: DEMO_CORREOS.admin ?? '' },
-  { label: 'SuperAdmin', correo: DEMO_CORREOS.superadmin ?? '' },
-]
-
 export function LoginPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +30,6 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) })
 
@@ -63,13 +48,6 @@ export function LoginPage() {
 
   const onSubmit = (data: LoginForm) => {
     doLogin(data.correo, data.contrasena)
-  }
-
-  const handleDemoLogin = (correo: string) => {
-    if (!DEMO_DISPONIBLE || !DEMO_PASSWORD || !correo) return
-    setValue('correo', correo)
-    setValue('contrasena', DEMO_PASSWORD)
-    doLogin(correo, DEMO_PASSWORD)
   }
 
   return (
@@ -173,40 +151,6 @@ export function LoginPage() {
           </form>
         </CardContent>
       </Card>
-
-      {/* Demo access — outside card, visually secondary */}
-      <div className="space-y-2.5">
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">Acceso demo</span>
-          <Separator className="flex-1" />
-        </div>
-        {DEMO_DISPONIBLE ? (
-          <>
-            <p className="text-center text-xs text-muted-foreground">
-              Prueba la aplicación con distintos roles
-            </p>
-            <div className="grid grid-cols-3 gap-2">
-              {DEMO_USERS.map((u) => (
-                <Button
-                  key={u.label}
-                  variant="outline"
-                  size="sm"
-                  disabled={loading || !u.correo}
-                  onClick={() => handleDemoLogin(u.correo)}
-                  className="h-9 rounded-xl text-xs"
-                >
-                  {u.label}
-                </Button>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="text-center text-xs text-muted-foreground">
-            Acceso demo no disponible en este entorno.
-          </p>
-        )}
-      </div>
 
       {/* Modal: Olvidé mi contraseña */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>

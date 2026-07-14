@@ -29,7 +29,17 @@ import { UserListSkeleton } from '@shared/components/PageSkeletons'
 import { useUsuarios, useToggleEstadoUsuario } from '../hooks/useUsuarios'
 import type { UsuarioResumenDto } from '../services/usuarioService'
 import type { UserRole } from '@types-app/index'
-import { ROUTES, userDetailPath, userEditPath } from '@constants/index'
+import {
+  ROUTES,
+  userDetailPath,
+  userEditPath,
+  empresaEditPath,
+  sucursalEditPath,
+} from '@constants/index'
+import { useEmpresas, useToggleEmpresa } from '@features/empresas/hooks/useEmpresas'
+import type { EmpresaResumenDto } from '@features/empresas/services/empresaService'
+import { useSucursales, useToggleSucursal } from '@features/sucursales/hooks/useSucursales'
+import type { SucursalResumenDto } from '@features/sucursales/services/sucursalService'
 
 // ── Tipos de presentación ─────────────────────────────────────────────────────
 
@@ -44,22 +54,6 @@ interface DisplayUser {
   sucursal: string
   area: string | undefined
   telefono: string | undefined
-}
-
-// Sucursales/areas sin API aún — estructura mínima para el panel de admin
-interface LocalSucursal {
-  id: string
-  name: string
-  address: string
-  ciudad: string
-  activo: boolean
-}
-
-interface LocalArea {
-  id: string
-  name: string
-  sucursalId: string
-  activo: boolean
 }
 
 // ── Mapper DTO → DisplayUser ──────────────────────────────────────────────────
@@ -231,13 +225,23 @@ export function UsersPage() {
   const [statusTarget, setStatusTarget] = useState<DisplayUser | null>(null)
   const [resetPwTarget, setResetPwTarget] = useState<DisplayUser | null>(null)
 
-  // Panel de Empresas/Sucursales (sin API por ahora)
-  // TODO: Conectar con /empresas y /sucursales cuando los endpoints estén disponibles
-  const [localSucursales] = useState<LocalSucursal[]>([])
-  const [localAreas] = useState<LocalArea[]>([])
-  const [selectedEmpresaFilter, setSelectedEmpresaFilter] = useState<string>('s1')
-  const [toggleEmpresaTarget, setToggleEmpresaTarget] = useState<LocalSucursal | null>(null)
-  const [toggleAreaTarget, setToggleAreaTarget] = useState<LocalArea | null>(null)
+  // Panel de Empresas y Sucursales
+  const { data: empresasData } = useEmpresas({ tamanoPagina: 100 })
+  const empresas = empresasData?.items ?? []
+  const toggleEmpresa = useToggleEmpresa()
+
+  const [selectedEmpresaPanel, setSelectedEmpresaPanel] = useState<string>('')
+  const empresaSeleccionadaId = selectedEmpresaPanel || empresas[0]?.id || ''
+
+  const { data: sucursalesData } = useSucursales({
+    empresaId: empresaSeleccionadaId || undefined,
+    tamanoPagina: 100,
+  })
+  const sucursales = sucursalesData?.items ?? []
+  const toggleSucursal = useToggleSucursal()
+
+  const [toggleEmpresaTarget, setToggleEmpresaTarget] = useState<EmpresaResumenDto | null>(null)
+  const [toggleSucursalTarget, setToggleSucursalTarget] = useState<SucursalResumenDto | null>(null)
 
   // Lista filtrada client-side (búsqueda y rol)
   const filtered = useMemo(() => {
@@ -288,20 +292,14 @@ export function UsersPage() {
 
   function handleToggleEmpresa() {
     if (!toggleEmpresaTarget) return
-    const nuevoEstado = !toggleEmpresaTarget.activo
-    toast.success(
-      `Empresa "${toggleEmpresaTarget.name}" ${nuevoEstado ? 'activada' : 'desactivada'} correctamente`,
-    )
-    setToggleEmpresaTarget(null)
+    toggleEmpresa.mutate(toggleEmpresaTarget.id, { onSuccess: () => setToggleEmpresaTarget(null) })
   }
 
-  function handleToggleArea() {
-    if (!toggleAreaTarget) return
-    const nuevoEstado = !toggleAreaTarget.activo
-    toast.success(
-      `Sucursal "${toggleAreaTarget.name}" ${nuevoEstado ? 'activada' : 'desactivada'} correctamente`,
-    )
-    setToggleAreaTarget(null)
+  function handleToggleSucursal() {
+    if (!toggleSucursalTarget) return
+    toggleSucursal.mutate(toggleSucursalTarget.id, {
+      onSuccess: () => setToggleSucursalTarget(null),
+    })
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -411,8 +409,9 @@ export function UsersPage() {
         </div>
       )}
 
-      {/* Sucursales y areas — admin view */}
+      {/* Paneles de Empresas y Sucursales */}
       <div className="grid gap-3 pt-2 lg:grid-cols-2">
+        {/* Panel Empresas */}
         <Card>
           <CardHeader className="px-3 pb-2 pt-3">
             <div className="flex items-center justify-between">
@@ -426,7 +425,7 @@ export function UsersPage() {
                 size="sm"
                 variant="outline"
                 className="h-7 gap-1.5 text-xs"
-                onClick={() => toast.info('Módulo de creación de empresas en desarrollo')}
+                onClick={() => navigate(ROUTES.EMPRESAS_NEW)}
               >
                 <Plus className="h-3 w-3" />
                 Nueva empresa
@@ -434,14 +433,14 @@ export function UsersPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-2 p-3 pt-0">
-            {localSucursales.length === 0 ? (
+            {empresas.length === 0 ? (
               <p className="py-4 text-center text-xs text-muted-foreground">
                 No hay empresas registradas.
               </p>
             ) : (
-              localSucursales.map((s) => (
+              empresas.map((empresa) => (
                 <div
-                  key={s.id}
+                  key={empresa.id}
                   className="flex items-center justify-between rounded-lg border p-3 text-sm"
                 >
                   <div className="flex items-start gap-3">
@@ -449,15 +448,22 @@ export function UsersPage() {
                       <Building2 className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{s.name}</p>
+                      <p className="font-medium">{empresa.nombre}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.address} · {s.ciudad}
+                        RUC: {empresa.ruc} · {empresa.totalSucursales} sucursal
+                        {empresa.totalSucursales !== 1 ? 'es' : ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Badge variant={s.activo ? 'default' : 'secondary'} className="text-[10px]">
-                      {s.activo ? 'Activa' : 'Inactiva'}
+                    <Badge
+                      className={
+                        empresa.activo
+                          ? 'border-transparent bg-green-100 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'border-transparent bg-gray-100 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                      }
+                    >
+                      {empresa.activo ? 'Activa' : 'Inactiva'}
                     </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -465,25 +471,25 @@ export function UsersPage() {
                           variant="ghost"
                           size="icon"
                           className="h-7 w-7"
-                          aria-label={`Acciones para empresa ${s.name}`}
+                          aria-label={`Acciones para ${empresa.nombre}`}
                         >
-                          <MoreHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
+                          <MoreHorizontal className="h-3.5 w-3.5" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => toast.info(`Editar empresa "${s.name}" — en desarrollo`)}
-                        >
+                        <DropdownMenuItem onClick={() => navigate(empresaEditPath(empresa.id))}>
                           <Pencil className="mr-2 h-3.5 w-3.5" />
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          className={s.activo ? 'text-destructive' : ''}
-                          onClick={() => setToggleEmpresaTarget(s)}
+                          className={
+                            empresa.activo ? 'text-destructive focus:text-destructive' : ''
+                          }
+                          onClick={() => setToggleEmpresaTarget(empresa)}
                         >
                           <Power className="mr-2 h-3.5 w-3.5" />
-                          {s.activo ? 'Desactivar' : 'Activar'}
+                          {empresa.activo ? 'Desactivar' : 'Activar'}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -494,6 +500,7 @@ export function UsersPage() {
           </CardContent>
         </Card>
 
+        {/* Panel Sucursales */}
         <Card>
           <CardHeader className="px-3 pb-2 pt-3">
             <div className="flex items-center justify-between">
@@ -501,95 +508,104 @@ export function UsersPage() {
                 <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                   Sucursales
                 </CardTitle>
-                <CardDescription>Departamentos por empresa</CardDescription>
+                <CardDescription>Sucursales por empresa</CardDescription>
               </div>
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 gap-1.5 text-xs"
-                onClick={() => toast.info('Módulo de creación de sucursales en desarrollo')}
+                onClick={() => navigate(ROUTES.SUCURSALES_NEW)}
               >
                 <Plus className="h-3 w-3" />
                 Nueva sucursal
               </Button>
             </div>
-            {/* Selector de empresa */}
-            <Select value={selectedEmpresaFilter} onValueChange={setSelectedEmpresaFilter}>
-              <SelectTrigger className="mt-2 h-7 text-xs">
-                <SelectValue placeholder="Selecciona empresa" />
-              </SelectTrigger>
-              <SelectContent>
-                {localSucursales.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {empresas.length > 0 && (
+              <Select value={empresaSeleccionadaId} onValueChange={setSelectedEmpresaPanel}>
+                <SelectTrigger className="mt-2 h-7 text-xs">
+                  <SelectValue placeholder="Selecciona empresa" />
+                </SelectTrigger>
+                <SelectContent>
+                  {empresas.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>
+                      {e.nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </CardHeader>
           <CardContent className="space-y-2 p-3 pt-0">
-            {localAreas
-              .filter((a) => a.sucursalId === selectedEmpresaFilter)
-              .map((area) => {
-                return (
-                  <div
-                    key={area.id}
-                    className="flex items-center justify-between rounded-lg border p-3 text-sm"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted">
-                        <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{area.name}</p>
-                        <p className="text-xs text-muted-foreground">0 personas</p>
-                      </div>
+            {sucursales.length === 0 ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">
+                {empresaSeleccionadaId
+                  ? 'No hay sucursales para esta empresa.'
+                  : 'Selecciona una empresa para ver sus sucursales.'}
+              </p>
+            ) : (
+              sucursales.map((sucursal) => (
+                <div
+                  key={sucursal.id}
+                  className="flex items-center justify-between rounded-lg border p-3 text-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
+                      <MapPin className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <Badge
-                        variant={area.activo ? 'default' : 'secondary'}
-                        className="text-[10px]"
-                      >
-                        {area.activo ? 'Activa' : 'Inactiva'}
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            aria-label={`Acciones para sucursal ${area.name}`}
-                          >
-                            <MoreHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              toast.info(`Editar sucursal "${area.name}" — en desarrollo`)
-                            }
-                          >
-                            <Pencil className="mr-2 h-3.5 w-3.5" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className={area.activo ? 'text-destructive' : ''}
-                            onClick={() => setToggleAreaTarget(area)}
-                          >
-                            <Power className="mr-2 h-3.5 w-3.5" />
-                            {area.activo ? 'Desactivar' : 'Activar'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium">{sucursal.nombre}</p>
+                        <span className="rounded bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
+                          {sucursal.codigo}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {sucursal.ciudad} · {sucursal.totalUsuarios} usuario
+                        {sucursal.totalUsuarios !== 1 ? 's' : ''}
+                      </p>
                     </div>
                   </div>
-                )
-              })}
-            {localAreas.filter((a) => a.sucursalId === selectedEmpresaFilter).length === 0 && (
-              <p className="py-4 text-center text-xs text-muted-foreground">
-                No hay sucursales registradas para esta empresa.
-              </p>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Badge
+                      className={
+                        sucursal.activo
+                          ? 'border-transparent bg-green-100 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'border-transparent bg-gray-100 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                      }
+                    >
+                      {sucursal.activo ? 'Activa' : 'Inactiva'}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          aria-label={`Acciones para ${sucursal.nombre}`}
+                        >
+                          <MoreHorizontal className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => navigate(sucursalEditPath(sucursal.id))}>
+                          <Pencil className="mr-2 h-3.5 w-3.5" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className={
+                            sucursal.activo ? 'text-destructive focus:text-destructive' : ''
+                          }
+                          onClick={() => setToggleSucursalTarget(sucursal)}
+                        >
+                          <Power className="mr-2 h-3.5 w-3.5" />
+                          {sucursal.activo ? 'Desactivar' : 'Activar'}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              ))
             )}
           </CardContent>
         </Card>
@@ -655,31 +671,33 @@ export function UsersPage() {
         description={
           toggleEmpresaTarget
             ? toggleEmpresaTarget.activo
-              ? `¿Deseas desactivar la empresa "${toggleEmpresaTarget.name}"?`
-              : `¿Deseas activar la empresa "${toggleEmpresaTarget.name}"?`
+              ? `¿Deseas desactivar la empresa "${toggleEmpresaTarget.nombre}"? Los usuarios de esta empresa no podrán acceder.`
+              : `¿Deseas activar la empresa "${toggleEmpresaTarget.nombre}"?`
             : undefined
         }
         confirmLabel={toggleEmpresaTarget?.activo ? 'Desactivar' : 'Activar'}
         variant={toggleEmpresaTarget?.activo ? 'destructive' : 'default'}
+        loading={toggleEmpresa.isPending}
         onConfirm={handleToggleEmpresa}
       />
 
       <ConfirmDialog
-        open={!!toggleAreaTarget}
+        open={!!toggleSucursalTarget}
         onOpenChange={(open) => {
-          if (!open) setToggleAreaTarget(null)
+          if (!open) setToggleSucursalTarget(null)
         }}
-        title={toggleAreaTarget?.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
+        title={toggleSucursalTarget?.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
         description={
-          toggleAreaTarget
-            ? toggleAreaTarget.activo
-              ? `¿Deseas desactivar la sucursal "${toggleAreaTarget.name}"?`
-              : `¿Deseas activar la sucursal "${toggleAreaTarget.name}"?`
+          toggleSucursalTarget
+            ? toggleSucursalTarget.activo
+              ? `¿Deseas desactivar la sucursal "${toggleSucursalTarget.nombre}"?`
+              : `¿Deseas activar la sucursal "${toggleSucursalTarget.nombre}"?`
             : undefined
         }
-        confirmLabel={toggleAreaTarget?.activo ? 'Desactivar' : 'Activar'}
-        variant={toggleAreaTarget?.activo ? 'destructive' : 'default'}
-        onConfirm={handleToggleArea}
+        confirmLabel={toggleSucursalTarget?.activo ? 'Desactivar' : 'Activar'}
+        variant={toggleSucursalTarget?.activo ? 'destructive' : 'default'}
+        loading={toggleSucursal.isPending}
+        onConfirm={handleToggleSucursal}
       />
     </div>
   )
