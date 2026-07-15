@@ -45,14 +45,15 @@ export function useSucursales(empresaId?: string) {
   })
 }
 
-export function useAreas(empresaId?: string) {
+export function useAreas(sucursalId?: string) {
   return useQuery({
-    queryKey: CATALOGO_KEYS.areas(empresaId),
+    queryKey: CATALOGO_KEYS.areas(sucursalId),
     queryFn: async () => {
-      const resp = await catalogoService.listarAreas(empresaId)
+      const resp = await catalogoService.listarAreas(sucursalId)
       return resp.items ?? []
     },
     staleTime: 1000 * 60 * 10,
+    enabled: !!sucursalId,
   })
 }
 

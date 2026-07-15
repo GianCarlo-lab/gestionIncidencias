@@ -28,7 +28,7 @@ export interface SucursalResumenDto {
 
 export interface AreaResumenDto {
   id: string
-  empresaId: string
+  sucursalId: string
   nombre: string
   activa: boolean
 }
@@ -82,10 +82,11 @@ export const catalogoService = {
       ...(empresaId ? { empresaId } : {}),
     }),
 
-  listarAreas: (empresaId?: string) =>
+  listarAreas: (sucursalId?: string) =>
     apiClient.get<PagedBackendResponse<AreaResumenDto>>('/areas', {
       tamanoPagina: 100,
-      ...(empresaId ? { empresaId } : {}),
+      soloActivas: true,
+      ...(sucursalId ? { sucursalId } : {}),
     }),
 
   listarTecnicos: (empresaId?: string) =>

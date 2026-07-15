@@ -114,9 +114,6 @@ function EditTicketSheet({ ticket, onClose, onSave }: EditTicketSheetProps) {
   const tiposServicio = tiposServicioQuery.data ?? []
   const sucursalesQuery = useSucursales(user?.empresaId)
   const sucursales = (sucursalesQuery.data ?? []).filter((s) => s.activa)
-  const areasQuery = useAreas(user?.empresaId)
-  const areas = (areasQuery.data ?? []).filter((a) => a.activa || a.id === ticket?.areaId)
-
   const initialPriority = ticket
     ? normalizePrioridad(ticket.prioridadEfectiva)
     : ('media' as TicketPriority)
@@ -131,9 +128,12 @@ function EditTicketSheet({ ticket, onClose, onSave }: EditTicketSheetProps) {
   })
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
 
-  // Areas shown in the select — no client-side sucursal filter since
-  // AreaResumenDto does not expose sucursalId
-  const areasFiltered = useMemo(() => areas, [areas])
+  const areasQuery = useAreas(form.sucursalId || undefined)
+  const areas = useMemo(
+    () => (areasQuery.data ?? []).filter((a) => a.activa || a.id === ticket?.areaId),
+    [areasQuery.data, ticket?.areaId],
+  )
+  const areasFiltered = areas
 
   useEffect(() => {
     if (ticket) {

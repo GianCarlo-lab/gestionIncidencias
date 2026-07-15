@@ -195,8 +195,6 @@ export function CreateTicketPage() {
   const categorias = (categoriasQuery.data ?? []).filter((c) => c.activa)
   const sucursalesQuery = useSucursales(user?.empresaId)
   const sucursales = (sucursalesQuery.data ?? []).filter((s) => s.activa)
-  const areasQuery = useAreas(user?.empresaId)
-  const areas = (areasQuery.data ?? []).filter((a) => a.activa)
 
   const defaultSucursal = user?.sucursalId ?? ''
 
@@ -216,6 +214,9 @@ export function CreateTicketPage() {
   })
 
   const watchedSucursal = watch('sucursalId')
+
+  const areasQuery = useAreas(watchedSucursal || undefined)
+  const areas = areasQuery.data ?? []
 
   const onSubmit = (data: CreateTicketForm) => {
     crearTicket.mutate(
@@ -434,13 +435,15 @@ export function CreateTicketPage() {
                       areas={areas}
                       value={field.value ?? ''}
                       onChange={field.onChange}
-                      disabled={!watchedSucursal || areasQuery.isLoading}
+                      disabled={!watchedSucursal || areasQuery.isLoading || areas.length === 0}
                       placeholder={
                         !watchedSucursal
-                          ? 'Primero selecciona una sucursal.'
+                          ? 'Primero selecciona una sucursal'
                           : areasQuery.isLoading
-                            ? 'Cargando...'
-                            : 'Buscar área...'
+                            ? 'Cargando áreas...'
+                            : areas.length === 0
+                              ? 'Sin áreas configuradas para esta sucursal'
+                              : 'Escribe para buscar un área...'
                       }
                       hasError={!!errors.areaId}
                     />
