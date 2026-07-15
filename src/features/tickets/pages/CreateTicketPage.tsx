@@ -111,6 +111,27 @@ function AreaCombobox({
     ? areas.filter((a) => a.nombre.toLowerCase().includes(text.toLowerCase()))
     : areas
 
+  function handleBlur() {
+    setTimeout(() => {
+      setOpen(false)
+      // Si ya hay una selección válida, nada que hacer
+      if (value) return
+      // Intentar auto-confirmar por coincidencia exacta o única opción filtrada
+      const exact = areas.find((a) => a.nombre.toLowerCase() === text.trim().toLowerCase())
+      if (exact) {
+        onChange(exact.id)
+        setText(exact.nombre)
+      } else if (filtered.length === 1) {
+        onChange(filtered[0].id)
+        setText(filtered[0].nombre)
+      } else {
+        // Texto inválido: limpiar para que el usuario sepa que debe elegir
+        setText('')
+        onChange('')
+      }
+    }, 150)
+  }
+
   return (
     <div className="relative">
       <Input
@@ -121,7 +142,7 @@ function AreaCombobox({
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={handleBlur}
         disabled={disabled}
         placeholder={placeholder}
         className={`h-8 text-xs${hasError ? 'ring-1 ring-destructive/50' : ''}`}
