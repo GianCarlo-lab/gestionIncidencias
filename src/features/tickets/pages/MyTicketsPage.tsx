@@ -6,6 +6,7 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   X,
   UserCheck,
   MoreVertical,
@@ -947,7 +948,8 @@ export function MyTicketsPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="h-full overflow-y-auto pb-8">
+                      {/* Área scrollable — padding-bottom para que el último ítem no quede bajo el gradiente */}
+                      <div className="h-full overflow-y-auto pb-20">
                         {entries.map((entry, i) => {
                           const actor = entry.actorNombre ?? 'Sistema'
                           const fecha = new Date(entry.createdAt).toLocaleString('es-PE', {
@@ -988,8 +990,11 @@ export function MyTicketsPage() {
                           )
                         })}
                       </div>
-                      {/* Gradiente inferior para indicar que hay más contenido */}
-                      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-card to-transparent" />
+
+                      {/* Indicador de scroll: gradiente + flecha */}
+                      <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex flex-col items-center pb-3 pt-8 [background:linear-gradient(to_top,hsl(var(--background))_40%,transparent)]">
+                        <ChevronDown className="h-5 w-5 animate-bounce text-muted-foreground/60" />
+                      </div>
                     </>
                   )}
                 </div>
@@ -1015,11 +1020,17 @@ export function MyTicketsPage() {
           </DialogHeader>
 
           {assigningTicket && (
-            <div className="flex items-start gap-2.5 rounded-xl bg-muted/60 px-3 py-2.5">
-              <UserCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <div className="min-w-0">
-                <p className="truncate text-xs font-medium">{assigningTicket.titulo}</p>
-                <p className="text-[11px] text-muted-foreground">{assigningTicket.codigo}</p>
+            <div className="bg-primary/8 flex items-start gap-3 rounded-xl border border-primary/20 px-4 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15">
+                <UserCheck className="h-4 w-4 text-primary" />
+              </div>
+              <div className="min-w-0 pt-0.5">
+                <p className="truncate text-sm font-semibold leading-tight">
+                  {assigningTicket.titulo}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-primary/70">
+                  {assigningTicket.codigo}
+                </p>
               </div>
             </div>
           )}
