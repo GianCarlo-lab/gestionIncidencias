@@ -225,6 +225,11 @@ public sealed class TicketRepository : ITicketRepository
             conditions.Add("t.solicitante_id = @SolicitanteId");
             parameters.Add("SolicitanteId", filtros.SolicitanteId.Value);
         }
+        if (filtros.ActorTrabajoId.HasValue)
+        {
+            conditions.Add("(t.solicitante_id = @ActorId OR t.tecnico_id = @ActorId)");
+            parameters.Add("ActorId", filtros.ActorTrabajoId.Value);
+        }
         if (filtros.Estado.HasValue)
         {
             conditions.Add("t.estado = @Estado::ticket_estado_tipo");

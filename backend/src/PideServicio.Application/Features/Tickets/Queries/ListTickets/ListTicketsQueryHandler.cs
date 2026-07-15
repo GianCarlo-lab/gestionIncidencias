@@ -39,6 +39,7 @@ public sealed class ListTicketsQueryHandler : IQueryHandler<ListTicketsQuery, Pa
         Guid? empresaId = null;
         Guid? tecnicoId = request.TecnicoId;
         Guid? solicitanteId = request.SolicitanteId;
+        Guid? actorTrabajoId = null;
 
         if (actor.Rol == RolTipo.SUPERADMIN)
         {
@@ -55,9 +56,16 @@ public sealed class ListTicketsQueryHandler : IQueryHandler<ListTicketsQuery, Pa
             tecnicoId = actor.Id;
             solicitanteId = null;
         }
+        else if (actor.Rol == RolTipo.TRABAJADOR)
+        {
+            // Trabajador ve los tickets que creó y los que tiene asignados
+            actorTrabajoId = actor.Id;
+            tecnicoId = null;
+            solicitanteId = null;
+        }
         else
         {
-            // Trabajador/Usuario ve solo los tickets que creó
+            // Usuario/otros: solo tickets creados por ellos
             solicitanteId = actor.Id;
             tecnicoId = null;
         }
@@ -68,6 +76,7 @@ public sealed class ListTicketsQueryHandler : IQueryHandler<ListTicketsQuery, Pa
             AreaId: request.AreaId,
             TecnicoId: tecnicoId,
             SolicitanteId: solicitanteId,
+            ActorTrabajoId: actorTrabajoId,
             Estado: request.Estado,
             Prioridad: request.Prioridad,
             FechaDesde: request.FechaDesde,

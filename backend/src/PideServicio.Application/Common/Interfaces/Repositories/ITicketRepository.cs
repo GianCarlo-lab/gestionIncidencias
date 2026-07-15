@@ -10,6 +10,9 @@ public sealed record TicketConsultaParams(
     Guid? AreaId = null,
     Guid? TecnicoId = null,
     Guid? SolicitanteId = null,
+    // Cuando está presente filtra: WHERE (solicitante_id = X OR tecnico_id = X)
+    // Usado para el rol TRABAJADOR que puede crear y recibir tickets asignados.
+    Guid? ActorTrabajoId = null,
     TicketEstadoTipo? Estado = null,
     PrioridadTipo? Prioridad = null,
     DateTimeOffset? FechaDesde = null,
