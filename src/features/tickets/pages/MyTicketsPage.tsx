@@ -911,7 +911,7 @@ export function MyTicketsPage() {
 
       {/* History sheet — bottom drawer para mejor UX mobile */}
       <Sheet open={!!historyTicketId} onOpenChange={(open) => !open && setHistoryTicketId(null)}>
-        <SheetContent side="bottom" className="flex max-h-[85dvh] flex-col rounded-t-2xl p-0">
+        <SheetContent side="bottom" className="flex h-[85dvh] flex-col rounded-t-2xl p-0">
           {(() => {
             const t = tickets.find((tk) => tk.id === historyTicketId)
             const entries = historialQuery.data ?? []
