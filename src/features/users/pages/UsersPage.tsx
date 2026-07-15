@@ -305,9 +305,10 @@ export function UsersPage() {
 
   function handleToggleSucursal() {
     if (!toggleSucursalTarget) return
-    toggleSucursal.mutate(toggleSucursalTarget.id, {
-      onSuccess: () => setToggleSucursalTarget(null),
-    })
+    toggleSucursal.mutate(
+      { id: toggleSucursalTarget.id, activa: toggleSucursalTarget.activa },
+      { onSuccess: () => setToggleSucursalTarget(null) },
+    )
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -562,25 +563,21 @@ export function UsersPage() {
                     <div>
                       <div className="flex items-center gap-1.5">
                         <p className="font-medium">{sucursal.nombre}</p>
-                        <span className="rounded bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
-                          {sucursal.codigo}
-                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {sucursal.ciudad} · {sucursal.totalUsuarios} usuario
-                        {sucursal.totalUsuarios !== 1 ? 's' : ''}
+                        Registrada el {new Date(sucursal.createdAt).toLocaleDateString('es-PE')}
                       </p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <Badge
                       className={
-                        sucursal.activo
+                        sucursal.activa
                           ? 'border-transparent bg-green-100 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400'
                           : 'border-transparent bg-gray-100 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400'
                       }
                     >
-                      {sucursal.activo ? 'Activa' : 'Inactiva'}
+                      {sucursal.activa ? 'Activa' : 'Inactiva'}
                     </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -601,12 +598,12 @@ export function UsersPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className={
-                            sucursal.activo ? 'text-destructive focus:text-destructive' : ''
+                            sucursal.activa ? 'text-destructive focus:text-destructive' : ''
                           }
                           onClick={() => setToggleSucursalTarget(sucursal)}
                         >
                           <Power className="mr-2 h-3.5 w-3.5" />
-                          {sucursal.activo ? 'Desactivar' : 'Activar'}
+                          {sucursal.activa ? 'Desactivar' : 'Activar'}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -696,16 +693,16 @@ export function UsersPage() {
         onOpenChange={(open) => {
           if (!open) setToggleSucursalTarget(null)
         }}
-        title={toggleSucursalTarget?.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
+        title={toggleSucursalTarget?.activa ? 'Desactivar sucursal' : 'Activar sucursal'}
         description={
           toggleSucursalTarget
-            ? toggleSucursalTarget.activo
+            ? toggleSucursalTarget.activa
               ? `¿Deseas desactivar la sucursal "${toggleSucursalTarget.nombre}"?`
               : `¿Deseas activar la sucursal "${toggleSucursalTarget.nombre}"?`
             : undefined
         }
-        confirmLabel={toggleSucursalTarget?.activo ? 'Desactivar' : 'Activar'}
-        variant={toggleSucursalTarget?.activo ? 'destructive' : 'default'}
+        confirmLabel={toggleSucursalTarget?.activa ? 'Desactivar' : 'Activar'}
+        variant={toggleSucursalTarget?.activa ? 'destructive' : 'default'}
         loading={toggleSucursal.isPending}
         onConfirm={handleToggleSucursal}
       />

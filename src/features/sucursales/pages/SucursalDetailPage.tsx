@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, MapPin, Phone, Building2, Power } from 'lucide-react'
+import { ArrowLeft, Pencil, MapPin, Power, FileText } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@shared/ui/button'
 import { Badge } from '@shared/ui/badge'
@@ -78,13 +78,8 @@ export function SucursalDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold tracking-tight">{sucursal.nombre}</h2>
-              <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
-                {sucursal.codigo}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">{sucursal.empresaNombre}</p>
+            <h2 className="text-base font-semibold tracking-tight">{sucursal.nombre}</h2>
+            <p className="text-xs text-muted-foreground">Detalle de sucursal</p>
           </div>
         </div>
         <Button
@@ -106,30 +101,15 @@ export function SucursalDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3 p-3 pt-0">
               <InfoRow
-                icon={<Building2 className="h-3.5 w-3.5" />}
-                label="Empresa"
-                value={sucursal.empresaNombre}
-              />
-              <InfoRow
                 icon={<MapPin className="h-3.5 w-3.5" />}
                 label="Nombre"
                 value={sucursal.nombre}
               />
-              <InfoRow
-                icon={<MapPin className="h-3.5 w-3.5" />}
-                label="Código"
-                value={sucursal.codigo}
-              />
-              <InfoRow
-                icon={<MapPin className="h-3.5 w-3.5" />}
-                label="Ciudad"
-                value={`${sucursal.ciudad}, ${sucursal.pais}`}
-              />
-              {sucursal.telefono && (
+              {sucursal.descripcion && (
                 <InfoRow
-                  icon={<Phone className="h-3.5 w-3.5" />}
-                  label="Teléfono"
-                  value={sucursal.telefono}
+                  icon={<FileText className="h-3.5 w-3.5" />}
+                  label="Descripción"
+                  value={sucursal.descripcion}
                 />
               )}
               {sucursal.direccion && (
@@ -153,22 +133,18 @@ export function SucursalDetailPage() {
                 <span className="text-muted-foreground">Estado actual</span>
                 <Badge
                   className={
-                    sucursal.activo
+                    sucursal.activa
                       ? 'border-transparent bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                       : 'border-transparent bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
                   }
                 >
-                  {sucursal.activo ? 'Activa' : 'Inactiva'}
+                  {sucursal.activa ? 'Activa' : 'Inactiva'}
                 </Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Usuarios</span>
-                <span className="font-semibold">{sucursal.totalUsuarios}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">Registrada el</span>
                 <span className="font-medium">
-                  {new Date(sucursal.creadoEn).toLocaleDateString('es-PE')}
+                  {new Date(sucursal.createdAt).toLocaleDateString('es-PE')}
                 </span>
               </div>
             </CardContent>
@@ -182,11 +158,11 @@ export function SucursalDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className={`w-full gap-1.5 ${sucursal.activo ? 'border-destructive/50 text-destructive hover:bg-destructive/10' : ''}`}
+                className={`w-full gap-1.5 ${sucursal.activa ? 'border-destructive/50 text-destructive hover:bg-destructive/10' : ''}`}
                 onClick={() => setConfirmToggle(true)}
               >
                 <Power className="h-3.5 w-3.5" />
-                {sucursal.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
+                {sucursal.activa ? 'Desactivar sucursal' : 'Activar sucursal'}
               </Button>
             </CardContent>
           </Card>
@@ -196,17 +172,20 @@ export function SucursalDetailPage() {
       <ConfirmDialog
         open={confirmToggle}
         onOpenChange={setConfirmToggle}
-        title={sucursal.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
+        title={sucursal.activa ? 'Desactivar sucursal' : 'Activar sucursal'}
         description={
-          sucursal.activo
+          sucursal.activa
             ? `¿Desactivar "${sucursal.nombre}"? Los usuarios de esta sucursal no podrán acceder.`
             : `¿Activar "${sucursal.nombre}"? Los usuarios de esta sucursal podrán volver a acceder.`
         }
-        confirmLabel={sucursal.activo ? 'Desactivar' : 'Activar'}
-        variant={sucursal.activo ? 'destructive' : 'default'}
+        confirmLabel={sucursal.activa ? 'Desactivar' : 'Activar'}
+        variant={sucursal.activa ? 'destructive' : 'default'}
         loading={toggleSucursal.isPending}
         onConfirm={() => {
-          toggleSucursal.mutate(sucursal.id, { onSuccess: () => setConfirmToggle(false) })
+          toggleSucursal.mutate(
+            { id: sucursal.id, activa: sucursal.activa },
+            { onSuccess: () => setConfirmToggle(false) },
+          )
         }}
       />
     </div>

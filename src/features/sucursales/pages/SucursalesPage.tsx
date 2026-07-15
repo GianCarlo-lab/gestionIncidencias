@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Plus, MoreHorizontal, MapPin, Power, Pencil, Eye, Building2 } from 'lucide-react'
+import { Search, Plus, MoreHorizontal, MapPin, Power, Pencil, Eye } from 'lucide-react'
 import { Button } from '@shared/ui/button'
 import { Input } from '@shared/ui/input'
 import { Badge } from '@shared/ui/badge'
@@ -30,7 +30,10 @@ export function SucursalesPage() {
 
   function handleToggle() {
     if (!toggleTarget) return
-    toggleSucursal.mutate(toggleTarget.id, { onSuccess: () => setToggleTarget(null) })
+    toggleSucursal.mutate(
+      { id: toggleTarget.id, activa: toggleTarget.activa },
+      { onSuccess: () => setToggleTarget(null) },
+    )
   }
 
   return (
@@ -118,14 +121,14 @@ export function SucursalesPage() {
         onOpenChange={(open) => {
           if (!open) setToggleTarget(null)
         }}
-        title={toggleTarget?.activo ? 'Desactivar sucursal' : 'Activar sucursal'}
+        title={toggleTarget?.activa ? 'Desactivar sucursal' : 'Activar sucursal'}
         description={
-          toggleTarget?.activo
+          toggleTarget?.activa
             ? `¿Desactivar "${toggleTarget.nombre}"? Los usuarios de esta sucursal no podrán acceder.`
             : `¿Activar "${toggleTarget?.nombre}"? Los usuarios de esta sucursal podrán volver a acceder.`
         }
-        confirmLabel={toggleTarget?.activo ? 'Desactivar' : 'Activar'}
-        variant={toggleTarget?.activo ? 'destructive' : 'default'}
+        confirmLabel={toggleTarget?.activa ? 'Desactivar' : 'Activar'}
+        variant={toggleTarget?.activa ? 'destructive' : 'default'}
         loading={toggleSucursal.isPending}
         onConfirm={handleToggle}
       />
@@ -154,30 +157,20 @@ function SucursalRow({ sucursal, onView, onEdit, onToggle }: SucursalRowProps) {
           </button>
 
           <button onClick={onView} className="min-w-0 flex-1 text-left focus-visible:outline-none">
-            <div className="flex items-center gap-2">
-              <p className="truncate text-sm font-semibold leading-tight">{sucursal.nombre}</p>
-              <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                {sucursal.codigo}
-              </span>
-            </div>
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-              <Building2 className="h-3 w-3 shrink-0" />
-              {sucursal.empresaNombre}
-            </p>
+            <p className="truncate text-sm font-semibold leading-tight">{sucursal.nombre}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {sucursal.ciudad}, {sucursal.pais} · {sucursal.totalUsuarios} usuario
-              {sucursal.totalUsuarios !== 1 ? 's' : ''}
+              Registrada el {new Date(sucursal.createdAt).toLocaleDateString('es-PE')}
             </p>
           </button>
 
           <Badge
             className={
-              sucursal.activo
+              sucursal.activa
                 ? 'border-transparent bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                 : 'border-transparent bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
             }
           >
-            {sucursal.activo ? 'Activa' : 'Inactiva'}
+            {sucursal.activa ? 'Activa' : 'Inactiva'}
           </Badge>
 
           <DropdownMenu>
@@ -198,10 +191,10 @@ function SucursalRow({ sucursal, onView, onEdit, onToggle }: SucursalRowProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={onToggle}
-                className={sucursal.activo ? 'text-destructive focus:text-destructive' : ''}
+                className={sucursal.activa ? 'text-destructive focus:text-destructive' : ''}
               >
                 <Power className="mr-2 h-3.5 w-3.5" />
-                {sucursal.activo ? 'Desactivar' : 'Activar'}
+                {sucursal.activa ? 'Desactivar' : 'Activar'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

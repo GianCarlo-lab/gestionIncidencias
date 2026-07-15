@@ -3,27 +3,26 @@ import { apiClient, type PagedBackendResponse } from '@services/apiClient'
 export interface SucursalResumenDto {
   id: string
   empresaId: string
-  empresaNombre: string
   nombre: string
-  codigo: string
-  ciudad: string
-  pais: string
-  telefono: string | null
-  activo: boolean
-  totalUsuarios: number
-  creadoEn: string
+  activa: boolean
+  createdAt: string
 }
 
-export interface SucursalDetalleDto extends SucursalResumenDto {
+export interface SucursalDto {
+  id: string
+  empresaId: string
+  nombre: string
+  descripcion: string | null
   direccion: string | null
-  latitud: number | null
-  longitud: number | null
+  responsableId: string | null
+  activa: boolean
+  createdAt: string
 }
 
 export interface SucursalListParams {
   busqueda?: string
   empresaId?: string
-  activo?: boolean
+  soloActivas?: boolean
   pagina?: number
   tamanoPagina?: number
 }
@@ -31,24 +30,16 @@ export interface SucursalListParams {
 export interface CrearSucursalDto {
   empresaId: string
   nombre: string
-  codigo: string
-  ciudad: string
-  pais: string
-  telefono?: string
+  descripcion?: string
   direccion?: string
-  latitud?: number
-  longitud?: number
+  responsableId?: string
 }
 
 export interface ActualizarSucursalDto {
   nombre: string
-  codigo: string
-  ciudad: string
-  pais: string
-  telefono?: string
+  descripcion?: string
   direccion?: string
-  latitud?: number
-  longitud?: number
+  responsableId?: string
 }
 
 type Params = Record<string, string | number | boolean | null | undefined>
@@ -57,13 +48,14 @@ export const sucursalService = {
   listar: (params?: SucursalListParams) =>
     apiClient.get<PagedBackendResponse<SucursalResumenDto>>('/sucursales', params as Params),
 
-  obtener: (id: string) => apiClient.get<SucursalDetalleDto>(`/sucursales/${id}`),
+  obtener: (id: string) => apiClient.get<SucursalDto>(`/sucursales/${id}`),
 
-  crear: (dto: CrearSucursalDto) => apiClient.post<SucursalDetalleDto>('/sucursales', dto),
+  crear: (dto: CrearSucursalDto) => apiClient.post<SucursalDto>('/sucursales', dto),
 
   actualizar: (id: string, dto: ActualizarSucursalDto) =>
-    apiClient.put<SucursalDetalleDto>(`/sucursales/${id}`, dto),
+    apiClient.put<SucursalDto>(`/sucursales/${id}`, dto),
 
-  toggleActivo: (id: string) =>
-    apiClient.put<{ activo: boolean }>(`/sucursales/${id}/toggle-activo`, {}),
+  activar: (id: string) => apiClient.patch<void>(`/sucursales/${id}/activar`),
+
+  desactivar: (id: string) => apiClient.patch<void>(`/sucursales/${id}/desactivar`),
 }

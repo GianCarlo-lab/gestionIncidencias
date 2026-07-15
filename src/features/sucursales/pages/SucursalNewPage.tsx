@@ -14,20 +14,14 @@ import { ROUTES } from '@constants/index'
 interface FormState {
   empresaId: string
   nombre: string
-  codigo: string
-  ciudad: string
-  pais: string
-  telefono: string
+  descripcion: string
   direccion: string
 }
 
 const INITIAL: FormState = {
   empresaId: '',
   nombre: '',
-  codigo: '',
-  ciudad: '',
-  pais: 'Perú',
-  telefono: '',
+  descripcion: '',
   direccion: '',
 }
 
@@ -55,9 +49,6 @@ export function SucursalNewPage() {
     const next: Partial<Record<keyof FormState, string>> = {}
     if (!form.empresaId) next.empresaId = 'Selecciona una empresa.'
     if (!form.nombre.trim()) next.nombre = 'Ingresa el nombre de la sucursal.'
-    if (!form.codigo.trim()) next.codigo = 'Ingresa un código identificador.'
-    if (!form.ciudad.trim()) next.ciudad = 'Ingresa la ciudad.'
-    if (!form.pais.trim()) next.pais = 'Ingresa el país.'
     setErrors(next)
     return Object.keys(next).length === 0
   }
@@ -68,10 +59,7 @@ export function SucursalNewPage() {
       {
         empresaId: form.empresaId,
         nombre: form.nombre.trim(),
-        codigo: form.codigo.trim().toUpperCase(),
-        ciudad: form.ciudad.trim(),
-        pais: form.pais.trim(),
-        telefono: form.telefono.trim() || undefined,
+        descripcion: form.descripcion.trim() || undefined,
         direccion: form.direccion.trim() || undefined,
       },
       { onSuccess: () => navigate(ROUTES.SUCURSALES) },
@@ -140,50 +128,15 @@ export function SucursalNewPage() {
                 />
               </FormField>
 
-              <FormField label="Código" required error={errors.codigo}>
-                <Input
-                  className="h-9 font-mono text-sm uppercase"
-                  placeholder="Ej. SC001"
-                  value={form.codigo}
-                  onChange={(e) => handleChange('codigo', e.target.value)}
-                  maxLength={10}
-                />
-              </FormField>
-
-              <FormField label="Teléfono" optional>
+              <FormField label="Descripción" optional>
                 <Input
                   className="h-9 text-sm"
-                  placeholder="+51 999 000 000"
-                  value={form.telefono}
-                  onChange={(e) => handleChange('telefono', e.target.value)}
+                  placeholder="Descripción breve de la sucursal"
+                  value={form.descripcion}
+                  onChange={(e) => handleChange('descripcion', e.target.value)}
                 />
               </FormField>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader className="px-3 pb-2 pt-3">
-              <CardTitle className="text-sm font-semibold">Ubicación</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 p-3 pt-0">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <FormField label="Ciudad" required error={errors.ciudad}>
-                  <Input
-                    className="h-9 text-sm"
-                    placeholder="Ej. Lima"
-                    value={form.ciudad}
-                    onChange={(e) => handleChange('ciudad', e.target.value)}
-                  />
-                </FormField>
-                <FormField label="País" required error={errors.pais}>
-                  <Input
-                    className="h-9 text-sm"
-                    placeholder="Ej. Perú"
-                    value={form.pais}
-                    onChange={(e) => handleChange('pais', e.target.value)}
-                  />
-                </FormField>
-              </div>
               <FormField label="Dirección" optional>
                 <Input
                   className="h-9 text-sm"
@@ -220,29 +173,21 @@ export function SucursalNewPage() {
                   <p className="text-sm font-semibold">
                     {form.nombre.trim() || 'Nombre de la sucursal'}
                   </p>
-                  {form.codigo.trim() && (
-                    <span className="mt-1 inline-block rounded bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
-                      {form.codigo.trim().toUpperCase()}
-                    </span>
+                  {form.descripcion.trim() && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {form.descripcion.trim()}
+                    </p>
                   )}
                 </div>
               </div>
-              <div className="space-y-1.5 text-xs">
-                {(form.ciudad.trim() || form.pais.trim()) && (
+              {form.direccion.trim() && (
+                <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between gap-2">
-                    <span className="text-muted-foreground">Ubicación</span>
-                    <span className="font-medium">
-                      {[form.ciudad.trim(), form.pais.trim()].filter(Boolean).join(', ')}
-                    </span>
+                    <span className="shrink-0 text-muted-foreground">Dirección</span>
+                    <span className="truncate text-right font-medium">{form.direccion.trim()}</span>
                   </div>
-                )}
-                {form.telefono.trim() && (
-                  <div className="flex justify-between gap-2">
-                    <span className="text-muted-foreground">Teléfono</span>
-                    <span className="font-medium">{form.telefono.trim()}</span>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

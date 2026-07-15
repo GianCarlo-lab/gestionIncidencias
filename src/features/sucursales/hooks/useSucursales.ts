@@ -62,7 +62,8 @@ export function useActualizarSucursal(id: string) {
 export function useToggleSucursal() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => sucursalService.toggleActivo(id),
+    mutationFn: ({ id, activa }: { id: string; activa: boolean }) =>
+      activa ? sucursalService.desactivar(id) : sucursalService.activar(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: SUCURSAL_KEYS.all })
       toast.success('Estado de sucursal actualizado.')
