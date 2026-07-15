@@ -1,4 +1,16 @@
-import { Menu, Bell, LogOut, User, Settings, Command } from 'lucide-react'
+import {
+  Menu,
+  Bell,
+  LogOut,
+  User,
+  Settings,
+  Command,
+  CheckCheck,
+  Info,
+  AlertCircle,
+  Ticket,
+  MessageSquare,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@shared/ui/button'
 import { Badge } from '@shared/ui/badge'
@@ -10,10 +22,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@shared/ui/dropdown-menu'
-import { ROUTES } from '@constants/index'
+import { ROUTES, ticketDetailPath } from '@constants/index'
 import { useAuthStore } from '@store/auth.store'
-import { useConteoNotificaciones } from '@features/notifications/hooks/useNotificaciones'
+import {
+  useConteoNotificaciones,
+  useNotificaciones,
+  useMarcarLeida,
+} from '@features/notifications/hooks/useNotificaciones'
 import { authService } from '@features/auth/services/authService'
+import { cn } from '@lib/utils'
 
 interface AppHeaderProps {
   onMenuClick?: () => void
@@ -21,12 +38,42 @@ interface AppHeaderProps {
   onCommandOpen?: () => void
 }
 
+const NOTIF_TYPE_ICON: Record<string, React.ElementType> = {
+  'ticket.nuevo': Ticket,
+  'ticket.asignado': CheckCheck,
+  'ticket.reasignado': CheckCheck,
+  'ticket.pendiente_validacion': AlertCircle,
+  'ticket.cerrado': AlertCircle,
+  'ticket.rechazado': AlertCircle,
+  'ticket.comentario': MessageSquare,
+}
+
+function timeAgoShort(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
+  if (diff < 60) return 'ahora'
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`
+  return `${Math.floor(diff / 86400)}d`
+}
+
 export function AppHeader({ onMenuClick, title, onCommandOpen }: AppHeaderProps) {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const isAdmin = user?.rol === 'admin' || user?.rol === 'superadmin'
+
   const { data: conteoData } = useConteoNotificaciones()
   const unreadCount = conteoData?.sinLeer ?? 0
+
+  const { data: notifsData } = useNotificaciones({ tamanoPagina: 6 })
+  const { mutate: marcarLeida } = useMarcarLeida()
+
+  const recientes = (notifsData?.items ?? []).slice(0, 5)
+
+  const handleNotifClick = (id: string, ticketId: string | null) => {
+    marcarLeida(id)
+    if (ticketId) navigate(ticketDetailPath(ticketId))
+    else navigate(ROUTES.NOTIFICATIONS)
+  }
 
   const handleLogout = async () => {
     await authService.logout()
@@ -65,26 +112,103 @@ export function AppHeader({ onMenuClick, title, onCommandOpen }: AppHeaderProps)
           <span className="hidden sm:inline">Ctrl+K</span>
         </Button>
 
-        {/* Notifications bell */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative hidden lg:flex"
-          onClick={() => navigate(ROUTES.NOTIFICATIONS)}
-          aria-label={
-            unreadCount > 0 ? `Notificaciones — ${unreadCount} sin leer` : 'Notificaciones'
-          }
-        >
-          <Bell className="h-5 w-5" aria-hidden="true" />
-          {unreadCount > 0 && (
-            <Badge
-              aria-hidden="true"
-              className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground"
+        {/* Notifications bell — dropdown con recientes */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              aria-label={
+                unreadCount > 0 ? `Notificaciones — ${unreadCount} sin leer` : 'Notificaciones'
+              }
             >
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </Badge>
-          )}
-        </Button>
+              <Bell className="h-5 w-5" aria-hidden="true" />
+              {unreadCount > 0 && (
+                <Badge
+                  aria-hidden="true"
+                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground"
+                >
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Badge>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end" className="w-80 p-0">
+            <DropdownMenuLabel className="flex items-center justify-between px-3 py-2.5">
+              <span className="text-sm font-semibold">Notificaciones</span>
+              {unreadCount > 0 && (
+                <Badge variant="secondary" className="text-[10px]">
+                  {unreadCount} sin leer
+                </Badge>
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="m-0" />
+
+            {recientes.length === 0 ? (
+              <div className="flex flex-col items-center gap-1 px-3 py-6 text-center">
+                <Bell className="h-6 w-6 text-muted-foreground/50" />
+                <p className="text-xs text-muted-foreground">Sin notificaciones</p>
+              </div>
+            ) : (
+              recientes.map((n) => {
+                const Icon = NOTIF_TYPE_ICON[n.tipoEvento ?? ''] ?? Info
+                const isUnread = !n.esLeida
+                return (
+                  <DropdownMenuItem
+                    key={n.id}
+                    className={cn(
+                      'flex cursor-pointer items-start gap-2.5 px-3 py-2.5 focus:bg-accent',
+                      isUnread && 'bg-primary/5',
+                    )}
+                    onClick={() => handleNotifClick(n.id, n.ticketId)}
+                  >
+                    <div
+                      className={cn(
+                        'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
+                        isUnread ? 'bg-primary/15' : 'bg-muted',
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          'h-3 w-3',
+                          isUnread ? 'text-primary' : 'text-muted-foreground',
+                        )}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={cn(
+                          'truncate text-xs leading-snug',
+                          isUnread
+                            ? 'font-semibold text-foreground'
+                            : 'font-medium text-foreground/75',
+                        )}
+                      >
+                        {n.titulo}
+                      </p>
+                      <p className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground">
+                        {n.cuerpo}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-[10px] text-muted-foreground">
+                      {timeAgoShort(n.createdAt)}
+                    </span>
+                  </DropdownMenuItem>
+                )
+              })
+            )}
+
+            <DropdownMenuSeparator className="m-0" />
+            <DropdownMenuItem
+              className="justify-center py-2 text-xs font-medium text-primary focus:text-primary"
+              onClick={() => navigate(ROUTES.NOTIFICATIONS)}
+            >
+              Ver todas las notificaciones
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* User dropdown */}
         {user && (
