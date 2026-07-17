@@ -12,6 +12,7 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useDashboardResumen } from '@features/dashboard/hooks/useDashboard'
 import {
   exportarDatosGeneralesPDF,
   exportarReporteMensualPDF,
@@ -40,46 +41,48 @@ import {
   Area,
 } from 'recharts'
 
-// TODO: conectar con endpoint de analytics cuando esté disponible.
-//       Los datos de los gráficos son temporales (placeholders de diseño).
-const byType = [
-  { tipo: 'Inc. Hardware', cantidad: 5 },
-  { tipo: 'Inc. Software', cantidad: 4 },
-  { tipo: 'Inc. Red', cantidad: 3 },
-  { tipo: 'Solicitud', cantidad: 2 },
-  { tipo: 'Mantenimiento', cantidad: 3 },
-  { tipo: 'Riesgo', cantidad: 1 },
-]
+const PRIORIDAD_COLORES: Record<string, string> = {
+  BAJA: '#22c55e',
+  MEDIA: '#f59e0b',
+  ALTA: '#f97316',
+  CRITICA: '#ef4444',
+}
 
-const bySucursal = [
-  { sucursal: 'Sede Central', resueltos: 7, pendientes: 5 },
-  { sucursal: 'Sucursal Norte', resueltos: 3, pendientes: 2 },
-  { sucursal: 'Sucursal Sur', resueltos: 2, pendientes: 3 },
-]
+const ESTADO_COLORES: Record<string, string> = {
+  SIN_ASIGNAR: '#6b7280',
+  ASIGNADO: '#3b82f6',
+  EN_PROCESO: '#f97316',
+  PENDIENTE_VALIDACION: '#f59e0b',
+  CERRADO: '#22c55e',
+  REABIERTO: '#ef4444',
+  EN_ESPERA: '#a855f7',
+  CANCELADO: '#374151',
+}
 
-const byPriority = [
-  { name: 'Baja', value: 2, color: 'hsl(var(--priority-baja))' },
-  { name: 'Media', value: 4, color: 'hsl(var(--priority-media))' },
-  { name: 'Alta', value: 5, color: 'hsl(var(--priority-alta))' },
-  { name: 'Crítica', value: 4, color: 'hsl(var(--priority-critica))' },
-]
+function prioridadLabel(p: string): string {
+  return (
+    ({ BAJA: 'Baja', MEDIA: 'Media', ALTA: 'Alta', CRITICA: 'Crítica' } as Record<string, string>)[
+      p
+    ] ?? p
+  )
+}
 
-const byStatus = [
-  { name: 'Sin asignar', value: 3, color: 'hsl(var(--ticket-sin-asignar))' },
-  { name: 'Asignado', value: 2, color: 'hsl(var(--ticket-asignado))' },
-  { name: 'En proceso', value: 4, color: 'hsl(var(--ticket-en-proceso))' },
-  { name: 'Pend. validación', value: 2, color: 'hsl(var(--ticket-pendiente))' },
-  { name: 'Cerrado', value: 4, color: 'hsl(var(--ticket-cerrado))' },
-]
-
-const byWeek = [
-  { semana: 'Sem 1', tickets: 3 },
-  { semana: 'Sem 2', tickets: 5 },
-  { semana: 'Sem 3', tickets: 4 },
-  { semana: 'Sem 4', tickets: 7 },
-  { semana: 'Sem 5', tickets: 6 },
-  { semana: 'Sem 6', tickets: 9 },
-]
+function estadoLabel(e: string): string {
+  return (
+    (
+      {
+        SIN_ASIGNAR: 'Sin asignar',
+        ASIGNADO: 'Asignado',
+        EN_PROCESO: 'En proceso',
+        PENDIENTE_VALIDACION: 'Pend. validación',
+        CERRADO: 'Cerrado',
+        REABIERTO: 'Reabierto',
+        EN_ESPERA: 'En espera',
+        CANCELADO: 'Cancelado',
+      } as Record<string, string>
+    )[e] ?? e
+  )
+}
 
 const AVAILABLE_REPORTS = [
   {
@@ -110,13 +113,47 @@ const AVAILABLE_REPORTS = [
 ]
 
 export function ReportsPage() {
+  const { data: resumen, isFetching, refetch } = useDashboardResumen()
+
   const [downloading, setDownloading] = useState<string | null>(null)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const handleRefresh = () => {
-    setIsRefreshing(true)
-    setTimeout(() => setIsRefreshing(false), 800)
+    void refetch()
   }
+
+  // ── Datos reales del backend ──────────────────────────────────────────────────
+
+  const byType = (resumen?.porTipoServicio ?? []).map((t) => ({
+    tipo: t.tipoServicioNombre,
+    cantidad: t.total,
+  }))
+
+  const bySucursal = (resumen?.porSucursal ?? []).map((s) => {
+    const areasDeEsta = (resumen?.porArea ?? []).filter((a) => a.sucursalId === s.sucursalId)
+    return {
+      sucursal: s.sucursalNombre,
+      resueltos: areasDeEsta.reduce((acc, a) => acc + a.cerrados, 0),
+      pendientes: areasDeEsta.reduce((acc, a) => acc + a.abiertos, 0),
+    }
+  })
+
+  const byPriority = (resumen?.porPrioridad ?? []).map((p) => ({
+    name: prioridadLabel(p.prioridad),
+    value: p.total,
+    color: PRIORIDAD_COLORES[p.prioridad] ?? '#6b7280',
+  }))
+
+  const byStatus = (resumen?.porEstado ?? []).map((e) => ({
+    name: estadoLabel(e.estado),
+    value: e.total,
+    color: ESTADO_COLORES[e.estado] ?? '#6b7280',
+  }))
+
+  const byWeek = (resumen?.tendenciaSemanal ?? []).map((s) => ({
+    semana: s.semana,
+    tickets: s.creados,
+  }))
+
   const [filterDesde, setFilterDesde] = useState('')
   const [filterHasta, setFilterHasta] = useState('')
   const [filterEmpresa, setFilterEmpresa] = useState('all')
@@ -193,10 +230,10 @@ export function ReportsPage() {
             size="icon"
             className="h-8 w-8"
             onClick={handleRefresh}
-            disabled={isRefreshing}
+            disabled={isFetching}
             title="Actualizar"
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
             <span className="sr-only">Actualizar</span>
           </Button>
           <Button
@@ -257,9 +294,11 @@ export function ReportsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas las empresas</SelectItem>
-                  <SelectItem value="s1">Sede Central</SelectItem>
-                  <SelectItem value="s2">Sucursal Norte</SelectItem>
-                  <SelectItem value="s3">Sucursal Sur</SelectItem>
+                  {(resumen?.porSucursal ?? []).map((s) => (
+                    <SelectItem key={s.sucursalId} value={s.sucursalId}>
+                      {s.sucursalNombre}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

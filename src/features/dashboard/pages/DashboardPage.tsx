@@ -538,18 +538,18 @@ function AdminDashboard() {
 
   // Contadores de estado para el mini-row
   const getEstado = (estado: string) =>
-    resumen.porEstado.find((e) => e.estado === estado)?.total ?? 0
+    (resumen.porEstado ?? []).find((e) => e.estado === estado)?.total ?? 0
 
   // ── Opciones de filtro derivadas del backend ──────────────────────────────────
 
-  const sucursalOptions = resumen.porSucursal.map((s) => ({
+  const sucursalOptions = (resumen.porSucursal ?? []).map((s) => ({
     id: s.sucursalId,
     name: s.sucursalNombre,
   }))
 
   const areaOptions =
     selectedSucursalId !== 'general'
-      ? resumen.porArea
+      ? (resumen.porArea ?? [])
           .filter((a) => a.sucursalId === selectedSucursalId)
           .map((a) => ({ id: a.areaId, name: a.areaNombre }))
       : []
@@ -579,7 +579,7 @@ function AdminDashboard() {
       priority: String(p.prioridad).toLowerCase(),
     }))
 
-  const sucursalData = resumen.porSucursal.map((s) => ({
+  const sucursalData = (resumen.porSucursal ?? []).map((s) => ({
     name:
       s.sucursalNombre.length > 12 ? s.sucursalNombre.substring(0, 12) + '...' : s.sucursalNombre,
     fullName: s.sucursalNombre,
@@ -590,8 +590,8 @@ function AdminDashboard() {
   // Filtro local por área en el gráfico de distribución por área
   const areaFiltrada =
     selectedAreaId !== 'general'
-      ? resumen.porArea.filter((a) => a.areaId === selectedAreaId)
-      : resumen.porArea
+      ? (resumen.porArea ?? []).filter((a) => a.areaId === selectedAreaId)
+      : (resumen.porArea ?? [])
 
   const areasData = areaFiltrada.map((a) => ({
     name: a.areaNombre.length > 14 ? a.areaNombre.substring(0, 14) + '.' : a.areaNombre,
@@ -599,7 +599,7 @@ function AdminDashboard() {
     cerrados: a.cerrados,
   }))
 
-  const tiposData = resumen.porTipoServicio.map((t, i) => ({
+  const tiposData = (resumen.porTipoServicio ?? []).map((t, i) => ({
     name:
       t.tipoServicioNombre.length > 16
         ? t.tipoServicioNombre.substring(0, 16) + '.'
@@ -608,23 +608,23 @@ function AdminDashboard() {
     color: TIPO_COLORS[i % TIPO_COLORS.length],
   }))
 
-  const responsableData = resumen.porTecnico.map((t) => ({
+  const responsableData = (resumen.porTecnico ?? []).map((t) => ({
     name: t.tecnicoNombre.split(' ')[0] ?? t.tecnicoNombre,
     fullName: t.tecnicoNombre,
     total: t.total,
   }))
 
   // Radar por sucursal (datos del backend)
-  const radarKeys = resumen.porSucursal.slice(0, 4).map((s) => {
+  const radarKeys = (resumen.porSucursal ?? []).slice(0, 4).map((s) => {
     const parts = s.sucursalNombre.split(' ')
     return parts.length > 1 ? parts[1] : parts[0]
   })
   const radarColors = ['#3b82f6', '#f97316', '#22c55e', '#8b5cf6']
   const radarData = ['Sin asignar', 'En proceso', 'Cerrados', 'Críticos'].map((metric) => {
     const entry: Record<string, string | number> = { metric }
-    resumen.porSucursal.slice(0, 4).forEach((s, idx) => {
+    ;(resumen.porSucursal ?? []).slice(0, 4).forEach((s, idx) => {
       const key = radarKeys[idx]
-      const areasSuc = resumen.porArea.filter((a) => a.sucursalId === s.sucursalId)
+      const areasSuc = (resumen.porArea ?? []).filter((a) => a.sucursalId === s.sucursalId)
       if (metric === 'Sin asignar') entry[key] = getEstado('SIN_ASIGNAR')
       if (metric === 'En proceso') entry[key] = getEstado('EN_PROCESO')
       if (metric === 'Cerrados') entry[key] = areasSuc.reduce((acc, a) => acc + a.cerrados, 0)
@@ -635,16 +635,16 @@ function AdminDashboard() {
 
   // ── Datos de tendencias del backend ───────────────────────────────────────────
 
-  const trendData = resumen.tendencia16Dias
-  const weeklyData = resumen.tendenciaSemanal
+  const trendData = resumen.tendencia16Dias ?? []
+  const weeklyData = resumen.tendenciaSemanal ?? []
 
   // ── Sparklines del backend ────────────────────────────────────────────────────
 
-  const sparkTrend = resumen.sparkAbiertos
-  const sparkCriticos = resumen.sparkCriticos
-  const sparkCerrados = resumen.sparkCerrados
-  const sparkTasa = resumen.sparkAbiertos.map((v, i) => {
-    const cerr = resumen.sparkCerrados[i] ?? 0
+  const sparkTrend = resumen.sparkAbiertos ?? []
+  const sparkCriticos = resumen.sparkCriticos ?? []
+  const sparkCerrados = resumen.sparkCerrados ?? []
+  const sparkTasa = (resumen.sparkAbiertos ?? []).map((v, i) => {
+    const cerr = (resumen.sparkCerrados ?? [])[i] ?? 0
     return v + cerr > 0 ? Math.round((cerr / (v + cerr)) * 100) : 0
   })
 

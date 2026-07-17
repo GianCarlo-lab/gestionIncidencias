@@ -21,7 +21,8 @@ export interface ResumenAreaDto {
   areaId: string
   areaNombre: string
   sucursalId: string
-  total: number
+  abiertos: number
+  cerrados: number
 }
 
 export interface ResumenTecnicoDto {
@@ -38,12 +39,14 @@ export interface ResumenTipoServicioDto {
 
 export interface TendenciaDiariaDto {
   fecha: string
-  total: number
+  creados: number
+  resueltos: number
 }
 
 export interface TendenciaSemanalDto {
   semana: string
-  total: number
+  creados: number
+  resueltos: number
 }
 
 export interface DashboardResumenDto {
@@ -59,6 +62,9 @@ export interface DashboardResumenDto {
   porTipoServicio: ResumenTipoServicioDto[]
   tendencia16Dias: TendenciaDiariaDto[]
   tendenciaSemanal: TendenciaSemanalDto[]
+  sparkAbiertos: number[]
+  sparkCriticos: number[]
+  sparkCerrados: number[]
 }
 
 export function useDashboardResumen(params?: { sucursalId?: string }) {
