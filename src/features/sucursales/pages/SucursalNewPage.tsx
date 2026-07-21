@@ -8,7 +8,7 @@ import { FormField } from '@shared/components/FormField'
 import { useCrearSucursal } from '../hooks/useSucursales'
 import { useEmpresas } from '@features/empresas/hooks/useEmpresas'
 import { useAuthStore } from '@store/auth.store'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
+import { SearchableSelect } from '@shared/components/SearchableSelect'
 import { ROUTES } from '@constants/index'
 
 interface FormState {
@@ -101,21 +101,15 @@ export function SucursalNewPage() {
             <CardContent className="space-y-3 p-3 pt-0">
               {isSuperAdmin && (
                 <FormField label="Empresa" required error={errors.empresaId}>
-                  <Select
+                  <SearchableSelect
+                    options={empresas.map((e) => ({ value: e.id, label: e.nombreComercial }))}
                     value={form.empresaId}
-                    onValueChange={(v) => handleChange('empresaId', v)}
-                  >
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue placeholder="Seleccionar empresa" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {empresas.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>
-                          {e.nombreComercial}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(v) => handleChange('empresaId', v)}
+                    placeholder="Seleccionar empresa"
+                    searchPlaceholder="Buscar empresa..."
+                    emptyMessage="Sin empresas."
+                    hasError={!!errors.empresaId}
+                  />
                 </FormField>
               )}
 
