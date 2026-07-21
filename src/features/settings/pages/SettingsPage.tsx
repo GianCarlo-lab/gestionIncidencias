@@ -105,12 +105,16 @@ export function SettingsPage() {
     if (parametrosError) toast.error(parametrosError.message)
   }, [parametrosError])
 
+  // SuperAdmin guarda en ámbito global (empresa_id null); Admin en el de su empresa.
+  // El GET siempre lee globals para SuperAdmin, por eso el PUT debe ser consistente.
+  const empresaIdParaGuardar = user?.rol === 'superadmin' ? undefined : user?.empresaId
+
   // Helper: guarda múltiples parámetros en paralelo y muestra toast según resultado
   const guardar = async (pares: Record<string, string>, mensajeExito: string) => {
     try {
       await Promise.all(
         Object.entries(pares).map(([clave, valor]) =>
-          configuracionService.actualizar(clave, valor, user?.empresaId),
+          configuracionService.actualizar(clave, valor, empresaIdParaGuardar),
         ),
       )
       void qc.invalidateQueries({ queryKey: ['configuracion'] })
