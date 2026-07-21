@@ -21,7 +21,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 import { Switch } from '@shared/ui/switch'
 import { Button } from '@shared/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
-import { Input } from '@shared/ui/input'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@shared/ui/tooltip'
 import { ConfirmDialog } from '@shared/components/ConfirmDialog'
 import { FormField } from '@shared/components/FormField'
@@ -125,7 +124,6 @@ export function SettingsPage() {
   }
 
   // General
-  const [nombreEmpresa, setNombreEmpresa] = useState('')
   const [zona, setZona] = useState('America/Lima')
   const [modoMantenimiento, setModoMantenimiento] = useState(false)
 
@@ -153,8 +151,6 @@ export function SettingsPage() {
   useEffect(() => {
     if (!parametros) return
     const get = (clave: string) => parametros.find((p) => p.clave === clave)?.valor
-    const nombreEmpresaVal = get('NOMBRE_EMPRESA')
-    if (nombreEmpresaVal) setNombreEmpresa(nombreEmpresaVal)
     const z = get('ZONA_HORARIA')
     if (z) setZona(z)
     const mm = get('MODO_MANTENIMIENTO')
@@ -202,49 +198,31 @@ export function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 p-3 pt-0">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <FormField
-                label={
-                  <>
-                    Nombre de la empresa
-                    <FieldTooltip text="Nombre legal o comercial de la organizacion. Aparece en reportes, correos y documentos generados por el sistema." />
-                  </>
-                }
-                required
+            <FormField
+              label={
+                <>
+                  Zona horaria
+                  <FieldTooltip text="Define la zona horaria base para registrar fechas de tickets, auditorias y notificaciones. Todos los timestamps del sistema se almacenan en UTC y se muestran en esta zona." />
+                </>
+              }
+              required
+            >
+              <Select
+                value={zona}
+                onValueChange={(v) => {
+                  setZona(v)
+                }}
               >
-                <Input
-                  value={nombreEmpresa}
-                  onChange={(e) => setNombreEmpresa(e.target.value)}
-                  className="h-9 text-sm"
-                  placeholder="Nombre de la empresa"
-                />
-              </FormField>
-              <FormField
-                label={
-                  <>
-                    Zona horaria
-                    <FieldTooltip text="Define la zona horaria base para registrar fechas de tickets, auditorias y notificaciones. Todos los timestamps del sistema se almacenan en UTC y se muestran en esta zona." />
-                  </>
-                }
-                required
-              >
-                <Select
-                  value={zona}
-                  onValueChange={(v) => {
-                    setZona(v)
-                  }}
-                >
-                  <SelectTrigger className="h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="America/Lima">America/Lima (UTC-5)</SelectItem>
-                    <SelectItem value="America/Bogota">America/Bogota (UTC-5)</SelectItem>
-                    <SelectItem value="America/Santiago">America/Santiago (UTC-4)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormField>
-            </div>
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="America/Lima">America/Lima (UTC-5)</SelectItem>
+                  <SelectItem value="America/Bogota">America/Bogota (UTC-5)</SelectItem>
+                  <SelectItem value="America/Santiago">America/Santiago (UTC-4)</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
 
             <ToggleRow
               label={
@@ -266,7 +244,6 @@ export function SettingsPage() {
                 onClick={() =>
                   void guardar(
                     {
-                      ...(nombreEmpresa.trim() ? { NOMBRE_EMPRESA: nombreEmpresa.trim() } : {}),
                       ZONA_HORARIA: zona,
                       MODO_MANTENIMIENTO: String(modoMantenimiento),
                     },
