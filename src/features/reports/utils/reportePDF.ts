@@ -12,8 +12,9 @@ const C_FONDO: [number, number, number] = [248, 250, 252]
 export interface FiltrosPDF {
   desde?: string
   hasta?: string
-  empresa?: string // etiqueta de display (nombre de empresa)
-  sucursal?: string // etiqueta de display (nombre de sucursal)
+  empresa?: string
+  sucursal?: string
+  area?: string
   estado?: string
 }
 
@@ -178,6 +179,7 @@ function etiquetaFiltros(filtros: FiltrosPDF): string {
   if (filtros.hasta) partes.push(`Hasta: ${fechaLegible(filtros.hasta)}`)
   if (filtros.empresa) partes.push(`Empresa: ${filtros.empresa}`)
   if (filtros.sucursal) partes.push(`Sucursal: ${filtros.sucursal}`)
+  if (filtros.area) partes.push(`Área: ${filtros.area}`)
   if (filtros.estado && filtros.estado !== 'all') partes.push(`Estado: ${filtros.estado}`)
   return partes.length ? partes.join('   |   ') : 'Sin filtros aplicados'
 }

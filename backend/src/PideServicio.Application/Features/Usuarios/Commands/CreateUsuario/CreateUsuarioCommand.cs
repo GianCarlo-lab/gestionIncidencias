@@ -1,6 +1,7 @@
 namespace PideServicio.Application.Features.Usuarios.Commands.CreateUsuario;
 
 using PideServicio.Application.Common.CQRS;
+using PideServicio.Application.Features.Usuarios.Commands;
 using PideServicio.Domain.Enums;
 
 public sealed record CreateUsuarioCommand(
@@ -12,4 +13,5 @@ public sealed record CreateUsuarioCommand(
     string NombreUsuario,
     string Contrasena,
     string? Telefono,
-    RolTipo Rol) : ICommand<Guid>;
+    RolTipo Rol,
+    IReadOnlyList<SucursalAsignacion>? Sucursales = null) : ICommand<Guid>;

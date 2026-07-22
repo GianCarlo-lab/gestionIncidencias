@@ -52,6 +52,7 @@ public static class DependencyInjection
         services.AddScoped<IMotivoRechazoRepository,     MotivoRechazoRepository>();
         services.AddScoped<IParametroRepository,         ParametroRepository>();
         services.AddScoped<ITecnicoSucursalRepository,   TecnicoSucursalRepository>();
+        services.AddScoped<IUsuarioSucursalRepository,  UsuarioSucursalRepository>();
 
         // Fase 7.0 — Dashboard Analytics
         services.AddScoped<IDashboardRepository, DashboardRepository>();

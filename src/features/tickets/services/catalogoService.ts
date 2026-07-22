@@ -82,11 +82,12 @@ export const catalogoService = {
       ...(empresaId ? { empresaId } : {}),
     }),
 
-  listarAreas: (sucursalId?: string) =>
+  listarAreas: (params?: { sucursalId?: string; empresaId?: string }) =>
     apiClient.get<PagedBackendResponse<AreaResumenDto>>('/areas', {
       tamanoPagina: 100,
       soloActivas: true,
-      ...(sucursalId ? { sucursalId } : {}),
+      ...(params?.sucursalId ? { sucursalId: params.sucursalId } : {}),
+      ...(params?.empresaId ? { empresaId: params.empresaId } : {}),
     }),
 
   listarTecnicos: (empresaId?: string) =>

@@ -16,4 +16,8 @@ public sealed record UsuarioDto(
     bool Activo,
     string? FotoUrl,
     DateTimeOffset? UltimoAcceso,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt)
+{
+    // Mapster no mapea esta propiedad; el handler la rellena manualmente tras Adapt<>.
+    public IReadOnlyList<SucursalAsignacionDto> Sucursales { get; init; } = [];
+}

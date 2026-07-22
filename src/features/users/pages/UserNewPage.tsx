@@ -9,11 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { FormField } from '@shared/components/FormField'
 import { useCrearUsuario, useRoles } from '../hooks/useUsuarios'
+import { SucursalMultiSelector } from '../components/SucursalMultiSelector'
+import type { SucursalItem } from '../components/SucursalMultiSelector'
 import { useEmpresas } from '@features/empresas/hooks/useEmpresas'
 import { useSucursales } from '@features/sucursales/hooks/useSucursales'
 import { useAuthStore } from '@store/auth.store'
 import type { UserRole } from '@types-app/index'
 import { ROUTES } from '@constants/index'
+
+const ROLES_MULTI_SUCURSAL: UserRole[] = ['tecnico', 'trabajador', 'usuario']
 
 // ── Constantes de presentación ────────────────────────────────────────────────
 
@@ -50,6 +54,7 @@ interface FormState {
   rol: UserRole | ''
   empresaId: string
   sucursalId: string
+  sucursalesMulti: SucursalItem[]
 }
 
 // ── UserNewPage ───────────────────────────────────────────────────────────────
@@ -70,10 +75,13 @@ export function UserNewPage() {
     rol: '',
     empresaId: isSuperAdmin ? '' : (currentUser?.empresaId ?? ''),
     sucursalId: '',
+    sucursalesMulti: [],
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
   const [showPw, setShowPw] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+
+  const isMultiSucursal = ROLES_MULTI_SUCURSAL.includes(form.rol as UserRole)
 
   // ── Datos externos ──────────────────────────────────────────────────────────
 
@@ -106,7 +114,11 @@ export function UserNewPage() {
   function handleChange(field: keyof FormState, value: string) {
     setForm((prev) => {
       const next = { ...prev, [field]: value }
-      if (field === 'empresaId') next.sucursalId = ''
+      if (field === 'empresaId') {
+        next.sucursalId = ''
+        next.sucursalesMulti = []
+      }
+      if (field === 'rol') next.sucursalesMulti = []
       return next
     })
     setErrors((prev) => ({ ...prev, [field]: undefined }))
@@ -128,7 +140,13 @@ export function UserNewPage() {
       next.confirmarContrasena = 'Las contraseñas no coinciden.'
     if (!form.rol) next.rol = 'Selecciona un rol.'
     if (!form.empresaId) next.empresaId = 'Selecciona una empresa.'
-    if (!form.sucursalId) next.sucursalId = 'Selecciona una sucursal.'
+    if (isMultiSucursal) {
+      if (form.sucursalesMulti.length === 0) next.sucursalId = 'Agrega al menos una sucursal.'
+      else if (!form.sucursalesMulti.some((s) => s.esPrincipal))
+        next.sucursalId = 'Marca una sucursal como principal.'
+    } else {
+      if (!form.sucursalId) next.sucursalId = 'Selecciona una sucursal.'
+    }
     setErrors(next)
     return Object.keys(next).length === 0
   }
@@ -143,9 +161,13 @@ export function UserNewPage() {
       .replace(/_{2,}/g, '_')
       .slice(0, 50)
 
+    const principalSucursalId = isMultiSucursal
+      ? (form.sucursalesMulti.find((s) => s.esPrincipal)?.sucursalId ?? '')
+      : form.sucursalId
+
     crearUsuario.mutate(
       {
-        sucursalId: form.sucursalId,
+        sucursalId: principalSucursalId,
         nombre: form.name.trim(),
         apellido: form.apellido.trim(),
         correo: form.correo.trim(),
@@ -153,6 +175,12 @@ export function UserNewPage() {
         contrasena: form.contrasena,
         telefono: form.telefono.trim() || undefined,
         rol: form.rol.toUpperCase(),
+        sucursales: isMultiSucursal
+          ? form.sucursalesMulti.map((s) => ({
+              sucursalId: s.sucursalId,
+              esPrincipal: s.esPrincipal,
+            }))
+          : undefined,
       },
       {
         onSuccess: () => {
@@ -360,36 +388,45 @@ export function UserNewPage() {
                 </div>
               )}
 
-              <FormField label="Sucursal" required error={errors.sucursalId}>
-                <Select
-                  value={form.sucursalId}
-                  onValueChange={(v) => handleChange('sucursalId', v)}
-                  disabled={!form.empresaId || loadingSucursales}
-                >
-                  <SelectTrigger className="h-9 text-sm">
-                    <SelectValue
-                      placeholder={
-                        !form.empresaId
-                          ? 'Selecciona una empresa primero'
-                          : loadingSucursales
-                            ? 'Cargando...'
-                            : 'Seleccionar sucursal'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sucursales.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-
-              <p className="text-[11px] text-muted-foreground">
-                Actualmente cada usuario puede pertenecer a una sola sucursal.
-              </p>
+              {isMultiSucursal ? (
+                <FormField label="Sucursales" required error={errors.sucursalId}>
+                  <SucursalMultiSelector
+                    value={form.sucursalesMulti}
+                    onChange={(v) => setForm((prev) => ({ ...prev, sucursalesMulti: v }))}
+                    opciones={sucursales.map((s) => ({ value: s.id, label: s.nombre }))}
+                    loadingOpciones={loadingSucursales}
+                    disabled={!form.empresaId}
+                    error={errors.sucursalId}
+                  />
+                </FormField>
+              ) : (
+                <FormField label="Sucursal" required error={errors.sucursalId}>
+                  <Select
+                    value={form.sucursalId}
+                    onValueChange={(v) => handleChange('sucursalId', v)}
+                    disabled={!form.empresaId || loadingSucursales}
+                  >
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue
+                        placeholder={
+                          !form.empresaId
+                            ? 'Selecciona una empresa primero'
+                            : loadingSucursales
+                              ? 'Cargando...'
+                              : 'Seleccionar sucursal'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sucursales.map((s) => (
+                        <SelectItem key={s.id} value={s.id}>
+                          {s.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              )}
             </CardContent>
           </Card>
 
@@ -452,14 +489,28 @@ export function UserNewPage() {
                   </Badge>
                 </div>
 
-                {form.sucursalId && (
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Sucursal</span>
-                    <span className="max-w-[120px] truncate text-right font-medium">
-                      {sucursales.find((s) => s.id === form.sucursalId)?.nombre ?? '—'}
-                    </span>
-                  </div>
-                )}
+                {isMultiSucursal
+                  ? form.sucursalesMulti.length > 0 && (
+                      <div className="flex items-start justify-between gap-2 text-xs">
+                        <span className="shrink-0 text-muted-foreground">Sucursales</span>
+                        <div className="text-right">
+                          {form.sucursalesMulti.map((s) => (
+                            <p key={s.sucursalId} className="truncate font-medium">
+                              {s.sucursalNombre}
+                              {s.esPrincipal && <span className="ml-1 text-primary">★</span>}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  : form.sucursalId && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Sucursal</span>
+                        <span className="max-w-[120px] truncate text-right font-medium">
+                          {sucursales.find((s) => s.id === form.sucursalId)?.nombre ?? '—'}
+                        </span>
+                      </div>
+                    )}
               </div>
 
               {/* Hint */}

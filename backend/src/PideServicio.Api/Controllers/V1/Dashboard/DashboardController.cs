@@ -18,6 +18,7 @@ public sealed class DashboardController : ApiControllerBase
     public async Task<IActionResult> Resumen(
         [FromQuery] Guid? empresaId,
         [FromQuery] Guid? sucursalId,
+        [FromQuery] Guid? areaId,
         CancellationToken ct)
-        => HandleResult(await Mediator.Send(new GetDashboardResumenQuery(empresaId, sucursalId), ct));
+        => HandleResult(await Mediator.Send(new GetDashboardResumenQuery(empresaId, sucursalId, areaId), ct));
 }

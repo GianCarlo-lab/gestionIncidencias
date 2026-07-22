@@ -13,12 +13,16 @@ public sealed class GetUsuarioByIdQueryHandler : IQueryHandler<GetUsuarioByIdQue
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ICurrentUserService _currentUserService;
 
+    private readonly IUsuarioSucursalRepository _usuarioSucursalRepository;
+
     public GetUsuarioByIdQueryHandler(
-        IUsuarioRepository usuarioRepository,
-        ICurrentUserService currentUserService)
+        IUsuarioRepository         usuarioRepository,
+        IUsuarioSucursalRepository usuarioSucursalRepository,
+        ICurrentUserService        currentUserService)
     {
-        _usuarioRepository = usuarioRepository;
-        _currentUserService = currentUserService;
+        _usuarioRepository         = usuarioRepository;
+        _usuarioSucursalRepository = usuarioSucursalRepository;
+        _currentUserService        = currentUserService;
     }
 
     public async Task<Result<UsuarioDto>> Handle(GetUsuarioByIdQuery request, CancellationToken ct)
@@ -42,7 +46,9 @@ public sealed class GetUsuarioByIdQueryHandler : IQueryHandler<GetUsuarioByIdQue
         if (!puedeVer)
             return Result.NoPermitido<UsuarioDto>("No tiene permisos para ver este usuario.");
 
-        var dto = usuario.Adapt<UsuarioDto>();
+        var dto      = usuario.Adapt<UsuarioDto>();
+        var sucursales = await _usuarioSucursalRepository.ListarPorUsuarioAsync(usuario.Id, ct);
+        dto = dto with { Sucursales = sucursales };
         return Result.Exito<UsuarioDto>(dto);
     }
 }

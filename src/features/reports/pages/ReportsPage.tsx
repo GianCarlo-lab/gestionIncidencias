@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
   FileBarChart,
+  FileSpreadsheet,
   Download,
   Calendar,
   TrendingUp,
@@ -20,6 +21,7 @@ import {
   exportarIncidenciasCriticasPDF,
   exportarCierrePorSucursalPDF,
 } from '../utils/reportePDF'
+import { exportarExcel } from '../utils/reporteExcel'
 import { Button } from '@shared/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/ui/card'
 import { Badge } from '@shared/ui/badge'
@@ -27,7 +29,7 @@ import { Input } from '@shared/ui/input'
 import { SearchableSelect } from '@shared/components/SearchableSelect'
 import { useAuthStore } from '@store/auth.store'
 import { empresaService } from '@features/empresas/services/empresaService'
-import { useSucursales } from '@features/tickets/hooks/useCatalogos'
+import { useSucursales, useAreas } from '@features/tickets/hooks/useCatalogos'
 import {
   ResponsiveContainer,
   BarChart,
@@ -124,6 +126,8 @@ export function ReportsPage() {
   const [selEmpresaLabel, setSelEmpresaLabel] = useState('')
   const [selSucursalId, setSelSucursalId] = useState('')
   const [selSucursalLabel, setSelSucursalLabel] = useState('')
+  const [selAreaId, setSelAreaId] = useState('')
+  const [selAreaLabel, setSelAreaLabel] = useState('')
   const [filterDesde, setFilterDesde] = useState('')
   const [filterHasta, setFilterHasta] = useState('')
 
@@ -134,6 +138,8 @@ export function ReportsPage() {
   const [appliedEmpresaLabel, setAppliedEmpresaLabel] = useState('')
   const [appliedSucursalId, setAppliedSucursalId] = useState<string | undefined>(undefined)
   const [appliedSucursalLabel, setAppliedSucursalLabel] = useState('')
+  const [appliedAreaId, setAppliedAreaId] = useState<string | undefined>(undefined)
+  const [appliedAreaLabel, setAppliedAreaLabel] = useState('')
 
   // ── Queries de catálogos ──────────────────────────────────────────────────
   const empresasQuery = useQuery({
@@ -152,13 +158,21 @@ export function ReportsPage() {
   const sucursalesQuery = useSucursales(empresaIdForSucursales)
   const sucursales = (sucursalesQuery.data ?? []).filter((s) => s.activa)
 
+  const areaIdContext = selSucursalId
+    ? { sucursalId: selSucursalId }
+    : empresaIdForSucursales
+      ? { empresaId: empresaIdForSucursales }
+      : undefined
+  const areasQuery = useAreas(areaIdContext)
+  const areas = (areasQuery.data ?? []).filter((a) => a.activa)
+
   // ── Hook de datos con filtros aplicados ───────────────────────────────────
   const dashboardParams = useMemo(
     () =>
-      appliedEmpresaId || appliedSucursalId
-        ? { empresaId: appliedEmpresaId, sucursalId: appliedSucursalId }
+      appliedEmpresaId || appliedSucursalId || appliedAreaId
+        ? { empresaId: appliedEmpresaId, sucursalId: appliedSucursalId, areaId: appliedAreaId }
         : undefined,
-    [appliedEmpresaId, appliedSucursalId],
+    [appliedEmpresaId, appliedSucursalId, appliedAreaId],
   )
 
   const { data: resumen, isFetching, refetch } = useDashboardResumen(dashboardParams)
@@ -202,11 +216,17 @@ export function ReportsPage() {
   // ── Opciones para SearchableSelect ───────────────────────────────────────
   const empresaOptions = empresas.map((e) => ({ value: e.id, label: e.nombreComercial }))
   const sucursalOptions = sucursales.map((s) => ({ value: s.id, label: s.nombre }))
+  const areaOptions = areas.map((a) => ({ value: a.id, label: a.nombre }))
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   const hasFilters = useMemo(
-    () => !!appliedEmpresaId || !!appliedSucursalId || filterDesde !== '' || filterHasta !== '',
-    [appliedEmpresaId, appliedSucursalId, filterDesde, filterHasta],
+    () =>
+      !!appliedEmpresaId ||
+      !!appliedSucursalId ||
+      !!appliedAreaId ||
+      filterDesde !== '' ||
+      filterHasta !== '',
+    [appliedEmpresaId, appliedSucursalId, appliedAreaId, filterDesde, filterHasta],
   )
 
   function handleEmpresaChange(id: string) {
@@ -215,12 +235,22 @@ export function ReportsPage() {
     setSelEmpresaLabel(label)
     setSelSucursalId('')
     setSelSucursalLabel('')
+    setSelAreaId('')
+    setSelAreaLabel('')
   }
 
   function handleSucursalChange(id: string) {
     const label = sucursales.find((s) => s.id === id)?.nombre ?? ''
     setSelSucursalId(id)
     setSelSucursalLabel(label)
+    setSelAreaId('')
+    setSelAreaLabel('')
+  }
+
+  function handleAreaChange(id: string) {
+    const label = areas.find((a) => a.id === id)?.nombre ?? ''
+    setSelAreaId(id)
+    setSelAreaLabel(label)
   }
 
   function handleApplyFilters() {
@@ -232,6 +262,8 @@ export function ReportsPage() {
     setAppliedEmpresaLabel(empresaLabel)
     setAppliedSucursalId(selSucursalId || undefined)
     setAppliedSucursalLabel(selSucursalLabel)
+    setAppliedAreaId(selAreaId || undefined)
+    setAppliedAreaLabel(selAreaLabel)
   }
 
   function handleClearFilters() {
@@ -239,12 +271,16 @@ export function ReportsPage() {
     setSelEmpresaLabel('')
     setSelSucursalId('')
     setSelSucursalLabel('')
+    setSelAreaId('')
+    setSelAreaLabel('')
     setFilterDesde('')
     setFilterHasta('')
     setAppliedEmpresaId(isAdmin ? (user?.empresaId ?? undefined) : undefined)
     setAppliedEmpresaLabel('')
     setAppliedSucursalId(undefined)
     setAppliedSucursalLabel('')
+    setAppliedAreaId(undefined)
+    setAppliedAreaLabel('')
   }
 
   // ── Exportaciones ─────────────────────────────────────────────────────────
@@ -253,6 +289,7 @@ export function ReportsPage() {
     hasta: filterHasta || undefined,
     empresa: appliedEmpresaLabel || undefined,
     sucursal: appliedSucursalLabel || undefined,
+    area: appliedAreaLabel || undefined,
   }
 
   const GENERADORES: Record<string, () => void> = {
@@ -260,6 +297,19 @@ export function ReportsPage() {
     'Rendimiento por técnico': () => exportarRendimientoPDF(resumen!),
     'Resumen de tickets críticos': () => exportarIncidenciasCriticasPDF(resumen!),
     'Índice de cierre por sucursal': () => exportarCierrePorSucursalPDF(resumen!),
+  }
+
+  const handleDownloadExcel = () => {
+    if (downloading || !resumen) return
+    setDownloading('excel')
+    const promise = exportarExcel(resumen, filtrosPDF).finally(() => setDownloading(null))
+    void import('sonner').then(({ toast }) => {
+      toast.promise(promise, {
+        loading: 'Generando Excel...',
+        success: 'Excel descargado correctamente',
+        error: 'Error al generar el Excel',
+      })
+    })
   }
 
   const handleDownload = (reportTitle: string) => {
@@ -318,6 +368,14 @@ export function ReportsPage() {
           <Button
             variant="outline"
             disabled={downloading !== null || !resumen}
+            onClick={handleDownloadExcel}
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            {downloading === 'excel' ? 'Generando...' : 'Exportar Excel'}
+          </Button>
+          <Button
+            variant="outline"
+            disabled={downloading !== null || !resumen}
             onClick={() => handleDownload('exportar-datos-generales')}
           >
             <Download className="mr-2 h-4 w-4" />
@@ -346,7 +404,7 @@ export function ReportsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-3 pt-0">
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-5">
             {/* Empresa */}
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-medium text-muted-foreground">Empresa</span>
@@ -379,6 +437,21 @@ export function ReportsPage() {
                 emptyMessage="Sin sucursales."
                 loading={sucursalesQuery.isLoading}
                 disabled={isSuperAdmin && !selEmpresaId}
+              />
+            </div>
+
+            {/* Área */}
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-medium text-muted-foreground">Área</span>
+              <SearchableSelect
+                options={areaOptions}
+                value={selAreaId}
+                onChange={handleAreaChange}
+                placeholder="Todas las áreas"
+                searchPlaceholder="Buscar área..."
+                emptyMessage="Sin áreas."
+                loading={areasQuery.isLoading}
+                disabled={!areaIdContext}
               />
             </div>
 

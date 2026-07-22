@@ -115,3 +115,24 @@ export function useRestablecerContrasena() {
     },
   })
 }
+
+export function useActualizarSucursales() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      sucursales,
+    }: {
+      id: string
+      sucursales: { sucursalId: string; esPrincipal: boolean }[]
+    }) => usuarioService.actualizarSucursales(id, sucursales),
+    onSuccess: (_data, { id }) => {
+      void qc.invalidateQueries({ queryKey: USER_KEYS.detail(id) })
+      void qc.invalidateQueries({ queryKey: USER_KEYS.all })
+      toast.success('Sucursales actualizadas correctamente.')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'No se pudieron actualizar las sucursales.')
+    },
+  })
+}

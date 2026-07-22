@@ -14,6 +14,13 @@ export interface UsuarioResumenDto {
   empresaId: string
 }
 
+export interface SucursalAsignacionItem {
+  sucursalId: string
+  sucursalNombre: string
+  esPrincipal: boolean
+  activo: boolean
+}
+
 export interface UsuarioDetalleDto {
   id: string
   authId: string
@@ -32,6 +39,7 @@ export interface UsuarioDetalleDto {
   fotoUrl: string | null
   ultimoAcceso: string | null
   createdAt: string
+  sucursales: SucursalAsignacionItem[]
 }
 
 export interface UsuarioListParams {
@@ -60,7 +68,11 @@ export const usuarioService = {
     contrasena: string
     telefono?: string
     rol: string
+    sucursales?: { sucursalId: string; esPrincipal: boolean }[]
   }) => apiClient.post<UsuarioDetalleDto>('/usuarios', body),
+
+  actualizarSucursales: (id: string, sucursales: { sucursalId: string; esPrincipal: boolean }[]) =>
+    apiClient.put(`/usuarios/${id}/sucursales`, { sucursales }),
 
   actualizarPerfil: (
     id: string,

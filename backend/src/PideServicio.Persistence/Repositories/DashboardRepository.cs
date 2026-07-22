@@ -25,7 +25,7 @@ public sealed class DashboardRepository : IDashboardRepository
     }
 
     public async Task<(int TotalAbiertos, int TotalCerrados, int Total, int Criticos, int CerradosHoy)>
-        ObtenerKpisAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerKpisAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT
@@ -39,11 +39,12 @@ public sealed class DashboardRepository : IDashboardRepository
             FROM tickets
             WHERE deleted_at IS NULL
               AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
-              AND (@SucursalId IS NULL OR sucursal_id = @SucursalId);
+              AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR area_id     = @AreaId);
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var row = await cn.QuerySingleOrDefaultAsync<KpiRow>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var row = await cn.QuerySingleOrDefaultAsync<KpiRow>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
 
         return row is null
             ? (0, 0, 0, 0, 0)
@@ -51,7 +52,7 @@ public sealed class DashboardRepository : IDashboardRepository
     }
 
     public async Task<IReadOnlyList<ContadorEstadoDto>>
-        ObtenerPorEstadoAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerPorEstadoAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT estado::text AS "Estado", COUNT(*)::int AS "Total"
@@ -59,17 +60,18 @@ public sealed class DashboardRepository : IDashboardRepository
             WHERE deleted_at IS NULL
               AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
               AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR area_id     = @AreaId)
             GROUP BY estado
             ORDER BY "Total" DESC;
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<ContadorEstadoDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<ContadorEstadoDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<ContadorPrioridadDto>>
-        ObtenerPorPrioridadAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerPorPrioridadAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT prioridad_efectiva::text AS "Prioridad", COUNT(*)::int AS "Total"
@@ -78,12 +80,13 @@ public sealed class DashboardRepository : IDashboardRepository
               AND estado::text NOT IN ('CERRADO', 'CANCELADO')
               AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
               AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR area_id     = @AreaId)
             GROUP BY prioridad_efectiva
             ORDER BY "Total" DESC;
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<ContadorPrioridadDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<ContadorPrioridadDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
@@ -106,7 +109,7 @@ public sealed class DashboardRepository : IDashboardRepository
     }
 
     public async Task<IReadOnlyList<ContadorAreaDto>>
-        ObtenerPorAreaAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerPorAreaAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT
@@ -120,17 +123,18 @@ public sealed class DashboardRepository : IDashboardRepository
             WHERE t.deleted_at IS NULL
               AND (@EmpresaId  IS NULL OR t.empresa_id  = @EmpresaId)
               AND (@SucursalId IS NULL OR t.sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR t.area_id     = @AreaId)
             GROUP BY t.area_id, a.nombre, t.sucursal_id
             ORDER BY 4 + 5 DESC;
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<ContadorAreaDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<ContadorAreaDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<ContadorTipoServicioDto>>
-        ObtenerPorTipoServicioAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerPorTipoServicioAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT
@@ -142,17 +146,18 @@ public sealed class DashboardRepository : IDashboardRepository
             WHERE t.deleted_at IS NULL
               AND (@EmpresaId  IS NULL OR t.empresa_id  = @EmpresaId)
               AND (@SucursalId IS NULL OR t.sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR t.area_id     = @AreaId)
             GROUP BY t.tipo_servicio_id, ts.nombre
             ORDER BY "Total" DESC;
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<ContadorTipoServicioDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<ContadorTipoServicioDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<ContadorTecnicoDto>>
-        ObtenerPorTecnicoAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerPorTecnicoAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT
@@ -166,18 +171,19 @@ public sealed class DashboardRepository : IDashboardRepository
               AND t.estado::text NOT IN ('CERRADO', 'CANCELADO')
               AND (@EmpresaId  IS NULL OR t.empresa_id  = @EmpresaId)
               AND (@SucursalId IS NULL OR t.sucursal_id = @SucursalId)
+              AND (@AreaId     IS NULL OR t.area_id     = @AreaId)
             GROUP BY u.id, u.nombre, u.apellido
             ORDER BY "Total" DESC
             LIMIT 10;
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<ContadorTecnicoDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<ContadorTecnicoDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<PuntoTendenciaDto>>
-        ObtenerTendenciaDiariaAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerTendenciaDiariaAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             WITH dias AS (
@@ -190,6 +196,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_creacion::date >= CURRENT_DATE - 15
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY fecha_creacion::date
             ),
             resueltos AS (
@@ -200,6 +207,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_cierre::date >= CURRENT_DATE - 15
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY fecha_cierre::date
             )
             SELECT
@@ -213,12 +221,12 @@ public sealed class DashboardRepository : IDashboardRepository
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<PuntoTendenciaDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<PuntoTendenciaDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<PuntoSemanalDto>>
-        ObtenerTendenciaSemanalAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerTendenciaSemanalAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             WITH semanas AS (
@@ -234,6 +242,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_creacion >= date_trunc('week', CURRENT_TIMESTAMP) - INTERVAL '3 weeks'
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY date_trunc('week', fecha_creacion)::date
             ),
             cerrados_sem AS (
@@ -244,6 +253,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_cierre >= date_trunc('week', CURRENT_TIMESTAMP) - INTERVAL '3 weeks'
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY date_trunc('week', fecha_cierre)::date
             )
             SELECT
@@ -257,12 +267,12 @@ public sealed class DashboardRepository : IDashboardRepository
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<PuntoSemanalDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<PuntoSemanalDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyList<SparklineRowDto>>
-        ObtenerSparklineAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default)
+        ObtenerSparklineAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default)
     {
         const string sql = """
             WITH dias AS (
@@ -275,6 +285,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_creacion::date >= CURRENT_DATE - 6
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY fecha_creacion::date
             ),
             criticos_dia AS (
@@ -285,6 +296,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND prioridad_efectiva::text = 'CRITICA'
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY fecha_creacion::date
             ),
             cerrados_dia AS (
@@ -295,6 +307,7 @@ public sealed class DashboardRepository : IDashboardRepository
                   AND fecha_cierre::date >= CURRENT_DATE - 6
                   AND (@EmpresaId  IS NULL OR empresa_id  = @EmpresaId)
                   AND (@SucursalId IS NULL OR sucursal_id = @SucursalId)
+                  AND (@AreaId     IS NULL OR area_id     = @AreaId)
                 GROUP BY fecha_cierre::date
             )
             SELECT
@@ -309,7 +322,7 @@ public sealed class DashboardRepository : IDashboardRepository
             """;
 
         await using var cn = (NpgsqlConnection)await _db.CrearConexionAsync(ct);
-        var rows = await cn.QueryAsync<SparklineRowDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId });
+        var rows = await cn.QueryAsync<SparklineRowDto>(sql, new { EmpresaId = empresaId, SucursalId = sucursalId, AreaId = areaId });
         return rows.ToList().AsReadOnly();
     }
 }

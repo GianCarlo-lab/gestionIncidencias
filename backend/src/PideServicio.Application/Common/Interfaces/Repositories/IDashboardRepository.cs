@@ -5,32 +5,32 @@ using PideServicio.Application.Features.Dashboard.DTOs;
 public interface IDashboardRepository
 {
     Task<(int TotalAbiertos, int TotalCerrados, int Total, int Criticos, int CerradosHoy)>
-        ObtenerKpisAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerKpisAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorEstadoDto>>
-        ObtenerPorEstadoAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerPorEstadoAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorPrioridadDto>>
-        ObtenerPorPrioridadAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerPorPrioridadAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorSucursalDto>>
         ObtenerPorSucursalAsync(Guid? empresaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorAreaDto>>
-        ObtenerPorAreaAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerPorAreaAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorTipoServicioDto>>
-        ObtenerPorTipoServicioAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerPorTipoServicioAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<ContadorTecnicoDto>>
-        ObtenerPorTecnicoAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerPorTecnicoAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<PuntoTendenciaDto>>
-        ObtenerTendenciaDiariaAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerTendenciaDiariaAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<PuntoSemanalDto>>
-        ObtenerTendenciaSemanalAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerTendenciaSemanalAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 
     Task<IReadOnlyList<SparklineRowDto>>
-        ObtenerSparklineAsync(Guid? empresaId, Guid? sucursalId, CancellationToken ct = default);
+        ObtenerSparklineAsync(Guid? empresaId, Guid? sucursalId, Guid? areaId, CancellationToken ct = default);
 }

@@ -4,7 +4,9 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PideServicio.Api.Controllers.Common;
+using PideServicio.Application.Features.Usuarios.Commands;
 using PideServicio.Application.Features.Usuarios.Commands.ActivarUsuario;
+using PideServicio.Application.Features.Usuarios.Commands.ActualizarSucursalesUsuario;
 using PideServicio.Application.Features.Usuarios.Commands.CambiarEstadoLaboral;
 using PideServicio.Application.Features.Usuarios.Commands.CambiarRol;
 using PideServicio.Application.Features.Usuarios.Commands.CreateUsuario;
@@ -87,7 +89,8 @@ public sealed class UsuariosController : ApiControllerBase
             request.NombreUsuario,
             request.Contrasena,
             request.Telefono,
-            request.Rol);
+            request.Rol,
+            request.Sucursales);
 
         var result = await Mediator.Send(command, ct);
         return HandleCreated(result, "GetUsuarioById", new { id = result.Valor });
@@ -182,6 +185,27 @@ public sealed class UsuariosController : ApiControllerBase
         return HandleResult(result);
     }
 
+    /// <summary>Reemplaza las sucursales asignadas a un usuario.</summary>
+    /// <remarks>
+    /// Solo Admin y SuperAdmin. La operación elimina todas las asignaciones actuales e inserta
+    /// las nuevas en una transacción atómica. Exactamente una debe estar marcada como principal.
+    /// Sincroniza automáticamente usuarios.sucursal_id con la sucursal principal.
+    /// </remarks>
+    [HttpPut("{id:guid}/sucursales")]
+    [Authorize(Policy = "Autenticado")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(422)]
+    public async Task<IActionResult> ActualizarSucursales(
+        Guid id,
+        [FromBody] ActualizarSucursalesRequest request,
+        CancellationToken ct)
+    {
+        var result = await Mediator.Send(
+            new ActualizarSucursalesUsuarioCommand(id, request.Sucursales), ct);
+        return HandleResult(result);
+    }
+
     /// <summary>Elimina lógicamente un usuario del sistema y de Supabase Auth.</summary>
     /// <remarks>
     /// Solo Admin y SuperAdmin. Un admin no puede eliminarse a sí mismo.
@@ -212,7 +236,11 @@ public sealed record CreateUsuarioRequest(
     string NombreUsuario,
     string Contrasena,
     string? Telefono,
-    RolTipo Rol);
+    RolTipo Rol,
+    IReadOnlyList<SucursalAsignacion>? Sucursales = null);
+
+/// <summary>Payload para reemplazar las sucursales de un usuario.</summary>
+public sealed record ActualizarSucursalesRequest(IReadOnlyList<SucursalAsignacion> Sucursales);
 
 /// <summary>Payload para actualizar el perfil de un usuario.</summary>
 public sealed record UpdatePerfilRequest(

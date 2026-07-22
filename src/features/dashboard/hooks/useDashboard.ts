@@ -67,7 +67,11 @@ export interface DashboardResumenDto {
   sparkCerrados: number[]
 }
 
-export function useDashboardResumen(params?: { empresaId?: string; sucursalId?: string }) {
+export function useDashboardResumen(params?: {
+  empresaId?: string
+  sucursalId?: string
+  areaId?: string
+}) {
   return useQuery({
     queryKey: ['dashboard', 'resumen', params],
     queryFn: () =>

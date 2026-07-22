@@ -148,7 +148,7 @@ function EditTicketSheet({ ticket, onClose, onSave }: EditTicketSheetProps) {
   })
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
 
-  const areasQuery = useAreas(form.sucursalId || undefined)
+  const areasQuery = useAreas({ sucursalId: form.sucursalId || undefined })
   const areas = useMemo(
     () => (areasQuery.data ?? []).filter((a) => a.activa || a.id === ticket?.areaId),
     [areasQuery.data, ticket?.areaId],

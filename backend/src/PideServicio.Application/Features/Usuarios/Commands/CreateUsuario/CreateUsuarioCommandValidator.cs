@@ -41,5 +41,16 @@ public sealed class CreateUsuarioCommandValidator : AbstractValidator<CreateUsua
 
         RuleFor(x => x.Rol)
             .IsInEnum().WithMessage("El rol especificado no es válido.");
+
+        When(x => x.Sucursales is { Count: > 0 }, () =>
+        {
+            RuleFor(x => x.Sucursales)
+                .Must(s => s!.Count(x => x.EsPrincipal) == 1)
+                .WithMessage("Si especifica sucursales, debe marcar exactamente una como principal.");
+
+            RuleForEach(x => x.Sucursales).ChildRules(s =>
+                s.RuleFor(x => x.SucursalId)
+                 .NotEmpty().WithMessage("El id de la sucursal no puede estar vacío."));
+        });
     }
 }

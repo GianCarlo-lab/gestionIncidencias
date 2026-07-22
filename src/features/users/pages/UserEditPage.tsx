@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'sonner'
 import { ArrowLeft, List, Building2, MapPin } from 'lucide-react'
 import { Button } from '@shared/ui/button'
 import { Input } from '@shared/ui/input'
@@ -13,12 +14,17 @@ import {
   useToggleEstadoUsuario,
   useRoles,
   useCambiarRol,
+  useActualizarSucursales,
 } from '../hooks/useUsuarios'
+import { SucursalMultiSelector } from '../components/SucursalMultiSelector'
+import type { SucursalItem } from '../components/SucursalMultiSelector'
 import { useAuthStore } from '@store/auth.store'
 import { useEmpresa } from '@features/empresas/hooks/useEmpresas'
-import { useSucursal } from '@features/sucursales/hooks/useSucursales'
+import { useSucursal, useSucursales } from '@features/sucursales/hooks/useSucursales'
 import type { UserRole } from '@types-app/index'
 import { userDetailPath, ROUTES } from '@constants/index'
+
+const ROLES_MULTI_SUCURSAL: UserRole[] = ['tecnico', 'trabajador', 'usuario']
 
 // ── Tipos de formulario ───────────────────────────────────────────────────────
 
@@ -44,6 +50,7 @@ export function UserEditPage() {
   const actualizarPerfil = useActualizarPerfil()
   const toggleEstado = useToggleEstadoUsuario()
   const cambiarRol = useCambiarRol()
+  const actualizarSucursal = useActualizarSucursales()
 
   const { data: rolesData } = useRoles()
   const roles = (rolesData?.items ?? []).filter(
@@ -52,6 +59,20 @@ export function UserEditPage() {
 
   const { data: empresa } = useEmpresa(user?.empresaId ?? '')
   const { data: sucursal } = useSucursal(user?.sucursalId ?? '')
+  const { data: sucursalesData, isLoading: loadingSucursales } = useSucursales(
+    user?.empresaId
+      ? { empresaId: user.empresaId, soloActivas: true, tamanoPagina: 100 }
+      : undefined,
+  )
+  const sucursalesOpciones = (sucursalesData?.items ?? []).map((s) => ({
+    value: s.id,
+    label: s.nombre,
+  }))
+
+  const isMultiSucursal = ROLES_MULTI_SUCURSAL.includes(
+    (user?.rol?.toLowerCase() ?? '') as UserRole,
+  )
+  const [sucursalesMulti, setSucursalesMulti] = useState<SucursalItem[]>([])
 
   const [form, setForm] = useState<UserFormState>({
     nombre: '',
@@ -73,6 +94,15 @@ export function UserEditPage() {
         rol: user.rol.toLowerCase() as UserRole,
         estado: user.activo ? 'activo' : 'inactivo',
       })
+      if (user.sucursales?.length) {
+        setSucursalesMulti(
+          user.sucursales.map((s) => ({
+            sucursalId: s.sucursalId,
+            sucursalNombre: s.sucursalNombre,
+            esPrincipal: s.esPrincipal,
+          })),
+        )
+      }
     }
   }, [user])
 
@@ -164,6 +194,21 @@ export function UserEditPage() {
         </Card>
       </div>
     )
+  }
+
+  function handleSaveSucursales() {
+    if (!id || sucursalesMulti.length === 0) return
+    if (!sucursalesMulti.some((s) => s.esPrincipal)) {
+      toast.error('Marca una sucursal como principal antes de guardar.')
+      return
+    }
+    actualizarSucursal.mutate({
+      id,
+      sucursales: sucursalesMulti.map((s) => ({
+        sucursalId: s.sucursalId,
+        esPrincipal: s.esPrincipal,
+      })),
+    })
   }
 
   const isSaving = actualizarPerfil.isPending || toggleEstado.isPending || cambiarRol.isPending
@@ -283,25 +328,48 @@ export function UserEditPage() {
           </CardContent>
         </Card>
 
-        {/* Card: Asignación (solo lectura) */}
+        {/* Card: Asignación */}
         <Card>
           <CardHeader className="px-4 pb-2 pt-4">
             <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
               Asignación
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="flex items-center gap-2.5 rounded-lg border bg-muted/20 px-3 py-2.5">
-                <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground">Empresa</p>
-                  <p className="truncate text-xs font-medium">
-                    {empresa?.nombreComercial ?? user.empresaId}
-                  </p>
+          <CardContent className="space-y-4 p-4 pt-0">
+            {/* Empresa (siempre solo lectura) */}
+            <div className="flex items-center gap-2.5 rounded-lg border bg-muted/20 px-3 py-2.5">
+              <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground">Empresa</p>
+                <p className="truncate text-xs font-medium">
+                  {empresa?.nombreComercial ?? user.empresaId}
+                </p>
+              </div>
+            </div>
+
+            {isMultiSucursal ? (
+              /* Sucursales editables para roles operativos */
+              <div className="space-y-2">
+                <p className="text-[11px] font-medium text-foreground">Sucursales asignadas</p>
+                <SucursalMultiSelector
+                  value={sucursalesMulti}
+                  onChange={setSucursalesMulti}
+                  opciones={sucursalesOpciones}
+                  loadingOpciones={loadingSucursales}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={actualizarSucursal.isPending || sucursalesMulti.length === 0}
+                    onClick={handleSaveSucursales}
+                  >
+                    {actualizarSucursal.isPending ? 'Guardando...' : 'Guardar sucursales'}
+                  </Button>
                 </div>
               </div>
-
+            ) : (
+              /* Sucursal solo lectura para admins/superadmins */
               <div className="flex items-center gap-2.5 rounded-lg border bg-muted/20 px-3 py-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
@@ -311,10 +379,13 @@ export function UserEditPage() {
                   </p>
                 </div>
               </div>
-            </div>
-            <p className="mt-2 text-[10px] text-muted-foreground">
-              Para cambiar la empresa o sucursal, contacta al superadministrador.
-            </p>
+            )}
+
+            {!isMultiSucursal && (
+              <p className="text-[10px] text-muted-foreground">
+                Para cambiar la empresa o sucursal, contacta al superadministrador.
+              </p>
+            )}
           </CardContent>
         </Card>
 

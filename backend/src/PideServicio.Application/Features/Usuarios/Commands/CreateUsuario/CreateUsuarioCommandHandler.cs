@@ -7,24 +7,30 @@ using PideServicio.Application.Common.Models;
 using PideServicio.Domain.Entities;
 using PideServicio.Domain.Enums;
 using PideServicio.Domain.Exceptions;
+using PideServicio.Application.Features.Usuarios.Commands;
 
 public sealed class CreateUsuarioCommandHandler : ICommandHandler<CreateUsuarioCommand, Guid>
 {
-    private readonly IUsuarioRepository _usuarioRepository;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly ISupabaseAuthService _supabaseAuth;
-    private readonly IAuditService _auditService;
+    private static readonly RolTipo[] _rolesMultiSucursal = [RolTipo.TECNICO, RolTipo.TRABAJADOR, RolTipo.USUARIO];
+
+    private readonly IUsuarioRepository         _usuarioRepository;
+    private readonly IUsuarioSucursalRepository _usuarioSucursalRepository;
+    private readonly ICurrentUserService        _currentUserService;
+    private readonly ISupabaseAuthService       _supabaseAuth;
+    private readonly IAuditService              _auditService;
 
     public CreateUsuarioCommandHandler(
-        IUsuarioRepository usuarioRepository,
-        ICurrentUserService currentUserService,
-        ISupabaseAuthService supabaseAuth,
-        IAuditService auditService)
+        IUsuarioRepository         usuarioRepository,
+        IUsuarioSucursalRepository usuarioSucursalRepository,
+        ICurrentUserService        currentUserService,
+        ISupabaseAuthService       supabaseAuth,
+        IAuditService              auditService)
     {
-        _usuarioRepository = usuarioRepository;
-        _currentUserService = currentUserService;
-        _supabaseAuth = supabaseAuth;
-        _auditService = auditService;
+        _usuarioRepository         = usuarioRepository;
+        _usuarioSucursalRepository = usuarioSucursalRepository;
+        _currentUserService        = currentUserService;
+        _supabaseAuth              = supabaseAuth;
+        _auditService              = auditService;
     }
 
     public async Task<Result<Guid>> Handle(CreateUsuarioCommand request, CancellationToken ct)
@@ -90,6 +96,26 @@ public sealed class CreateUsuarioCommandHandler : ICommandHandler<CreateUsuarioC
                     creadoPor: actorDb.Id);
 
                 nuevoId = await _usuarioRepository.CrearAsync(usuario, ct);
+
+                // Para roles operativos, registrar asignaciones de sucursal
+                if (_rolesMultiSucursal.Contains(request.Rol))
+                {
+                    if (request.Sucursales is { Count: > 0 })
+                    {
+                        // Usar la lista proporcionada (no-principales primero → trigger-safe)
+                        foreach (var s in request.Sucursales.OrderBy(x => x.EsPrincipal))
+                        {
+                            var us = UsuarioSucursal.Asignar(nuevoId, s.SucursalId, s.EsPrincipal, actorDb.Id);
+                            await _usuarioSucursalRepository.InsertarAsync(us, ct);
+                        }
+                    }
+                    else
+                    {
+                        // Compatibilidad con callers que solo envían SucursalId
+                        var us = UsuarioSucursal.Asignar(nuevoId, request.SucursalId, esPrincipal: true, actorDb.Id);
+                        await _usuarioSucursalRepository.InsertarAsync(us, ct);
+                    }
+                }
             }
             catch
             {

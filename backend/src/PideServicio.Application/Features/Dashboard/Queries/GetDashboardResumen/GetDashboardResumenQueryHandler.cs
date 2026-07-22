@@ -41,6 +41,7 @@ public sealed class GetDashboardResumenQueryHandler
 
         Guid? empresaId;
         Guid? sucursalId;
+        Guid? areaId = request.AreaId;
 
         if (actor.Rol == RolTipo.SUPERADMIN)
         {
@@ -59,16 +60,16 @@ public sealed class GetDashboardResumenQueryHandler
             return Result.NoPermitido<DashboardResumenDto>("No tiene permisos para acceder al dashboard.");
         }
 
-        var kpisTask            = _dashboardRepository.ObtenerKpisAsync(empresaId, sucursalId, cancellationToken);
-        var porEstadoTask       = _dashboardRepository.ObtenerPorEstadoAsync(empresaId, sucursalId, cancellationToken);
-        var porPrioridadTask    = _dashboardRepository.ObtenerPorPrioridadAsync(empresaId, sucursalId, cancellationToken);
+        var kpisTask            = _dashboardRepository.ObtenerKpisAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var porEstadoTask       = _dashboardRepository.ObtenerPorEstadoAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var porPrioridadTask    = _dashboardRepository.ObtenerPorPrioridadAsync(empresaId, sucursalId, areaId, cancellationToken);
         var porSucursalTask     = _dashboardRepository.ObtenerPorSucursalAsync(empresaId, cancellationToken);
-        var porAreaTask         = _dashboardRepository.ObtenerPorAreaAsync(empresaId, sucursalId, cancellationToken);
-        var porTipoServicioTask = _dashboardRepository.ObtenerPorTipoServicioAsync(empresaId, sucursalId, cancellationToken);
-        var porTecnicoTask      = _dashboardRepository.ObtenerPorTecnicoAsync(empresaId, sucursalId, cancellationToken);
-        var tendenciaDiariaTask = _dashboardRepository.ObtenerTendenciaDiariaAsync(empresaId, sucursalId, cancellationToken);
-        var tendenciaSemTask    = _dashboardRepository.ObtenerTendenciaSemanalAsync(empresaId, sucursalId, cancellationToken);
-        var sparklineTask       = _dashboardRepository.ObtenerSparklineAsync(empresaId, sucursalId, cancellationToken);
+        var porAreaTask         = _dashboardRepository.ObtenerPorAreaAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var porTipoServicioTask = _dashboardRepository.ObtenerPorTipoServicioAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var porTecnicoTask      = _dashboardRepository.ObtenerPorTecnicoAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var tendenciaDiariaTask = _dashboardRepository.ObtenerTendenciaDiariaAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var tendenciaSemTask    = _dashboardRepository.ObtenerTendenciaSemanalAsync(empresaId, sucursalId, areaId, cancellationToken);
+        var sparklineTask       = _dashboardRepository.ObtenerSparklineAsync(empresaId, sucursalId, areaId, cancellationToken);
 
         await Task.WhenAll(
             kpisTask,
