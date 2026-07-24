@@ -8,6 +8,7 @@ import { Badge } from '@shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { FormField } from '@shared/components/FormField'
+import { SearchableSelect } from '@shared/components/SearchableSelect'
 import { useCrearUsuario, useRoles } from '../hooks/useUsuarios'
 import { SucursalMultiSelector } from '../components/SucursalMultiSelector'
 import type { SucursalItem } from '../components/SucursalMultiSelector'
@@ -359,24 +360,17 @@ export function UserNewPage() {
             <CardContent className="space-y-3 p-3 pt-0">
               {isSuperAdmin ? (
                 <FormField label="Empresa" required error={errors.empresaId}>
-                  <Select
+                  <SearchableSelect
+                    options={empresas.map((e) => ({ value: e.id, label: e.nombreComercial }))}
                     value={form.empresaId}
-                    onValueChange={(v) => handleChange('empresaId', v)}
+                    onChange={(v) => handleChange('empresaId', v)}
+                    placeholder={loadingEmpresas ? 'Cargando...' : 'Seleccionar empresa'}
+                    searchPlaceholder="Buscar empresa..."
+                    emptyMessage="Sin empresas disponibles."
+                    loading={loadingEmpresas}
+                    hasError={!!errors.empresaId}
                     disabled={loadingEmpresas}
-                  >
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue
-                        placeholder={loadingEmpresas ? 'Cargando...' : 'Seleccionar empresa'}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {empresas.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>
-                          {e.nombreComercial}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </FormField>
               ) : (
                 <div className="flex items-center gap-2.5 rounded-lg border bg-muted/30 px-3 py-2.5">
@@ -401,30 +395,23 @@ export function UserNewPage() {
                 </FormField>
               ) : (
                 <FormField label="Sucursal" required error={errors.sucursalId}>
-                  <Select
+                  <SearchableSelect
+                    options={sucursales.map((s) => ({ value: s.id, label: s.nombre }))}
                     value={form.sucursalId}
-                    onValueChange={(v) => handleChange('sucursalId', v)}
+                    onChange={(v) => handleChange('sucursalId', v)}
+                    placeholder={
+                      !form.empresaId
+                        ? 'Selecciona una empresa primero'
+                        : loadingSucursales
+                          ? 'Cargando...'
+                          : 'Seleccionar sucursal'
+                    }
+                    searchPlaceholder="Buscar sucursal..."
+                    emptyMessage="Sin sucursales disponibles."
+                    loading={loadingSucursales}
+                    hasError={!!errors.sucursalId}
                     disabled={!form.empresaId || loadingSucursales}
-                  >
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue
-                        placeholder={
-                          !form.empresaId
-                            ? 'Selecciona una empresa primero'
-                            : loadingSucursales
-                              ? 'Cargando...'
-                              : 'Seleccionar sucursal'
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sucursales.map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.nombre}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </FormField>
               )}
             </CardContent>

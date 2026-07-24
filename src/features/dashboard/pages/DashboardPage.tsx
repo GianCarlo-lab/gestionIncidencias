@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@shared/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
+import { SearchableSelect } from '@shared/components/SearchableSelect'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/ui/card'
 import { StatusBadge } from '@shared/components/StatusBadge'
 import { PriorityBadge } from '@shared/components/PriorityBadge'
@@ -1062,42 +1062,35 @@ function AdminDashboard() {
         <div className="flex flex-wrap items-center gap-2">
           {isAdmin && (
             <>
-              {/* Filtro por empresa (sucursal en BD) */}
-              <Select value={selectedSucursalId} onValueChange={handleSucursalChange}>
-                <SelectTrigger className="h-9 w-auto min-w-[140px] text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">General (todas)</SelectItem>
-                  {sucursalOptions.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {/* Filtro por sucursal (área en BD), activo solo si hay empresa seleccionada */}
-              <Select
-                value={selectedAreaId}
-                onValueChange={setSelectedAreaId}
-                disabled={selectedSucursalId === 'general'}
-              >
-                <SelectTrigger className="h-9 w-auto min-w-[140px] text-xs">
-                  <SelectValue
-                    placeholder={
-                      selectedSucursalId === 'general' ? 'Todas las sucursales' : 'Todas'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">Todas las sucursales</SelectItem>
-                  {areaOptions.map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Filtro por sucursal */}
+              <div className="w-[180px]">
+                <SearchableSelect
+                  options={[
+                    { value: 'general', label: 'General (todas)' },
+                    ...sucursalOptions.map((s) => ({ value: s.id, label: s.name })),
+                  ]}
+                  value={selectedSucursalId}
+                  onChange={handleSucursalChange}
+                  placeholder="Sucursal..."
+                  searchPlaceholder="Buscar sucursal..."
+                  emptyMessage="Sin sucursales."
+                />
+              </div>
+              {/* Filtro por área, activo solo si hay sucursal seleccionada */}
+              <div className="w-[160px]">
+                <SearchableSelect
+                  options={[
+                    { value: 'general', label: 'Todas las áreas' },
+                    ...areaOptions.map((a) => ({ value: a.id, label: a.name })),
+                  ]}
+                  value={selectedAreaId}
+                  onChange={setSelectedAreaId}
+                  placeholder="Área..."
+                  searchPlaceholder="Buscar área..."
+                  emptyMessage="Sin áreas."
+                  disabled={selectedSucursalId === 'general'}
+                />
+              </div>
             </>
           )}
           <Button

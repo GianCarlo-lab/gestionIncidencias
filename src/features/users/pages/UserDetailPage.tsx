@@ -102,7 +102,7 @@ export function UserDetailPage() {
           title="Usuario no encontrado"
           description="El usuario que buscas no existe o fue eliminado."
           action={
-            <Button variant="outline" size="sm" onClick={() => navigate('/usuarios')}>
+            <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.USERS)}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a usuarios
             </Button>
@@ -140,7 +140,7 @@ export function UserDetailPage() {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => navigate('/usuarios')}
+            onClick={() => navigate(ROUTES.USERS)}
             aria-label="Volver"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -368,11 +368,6 @@ export function UserDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 p-3 pt-0">
-              <Button className="w-full" size="sm" onClick={() => navigate(userEditPath(user.id))}>
-                <Edit className="mr-2 h-4 w-4" />
-                Editar usuario
-              </Button>
-
               <Button className="w-full" variant="outline" size="sm" onClick={handleResetPassword}>
                 Restablecer contrasena
               </Button>

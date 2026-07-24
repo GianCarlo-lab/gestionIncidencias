@@ -1,20 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Search,
-  Plus,
-  MoreHorizontal,
-  Check,
-  X,
-  Pencil,
-  Power,
-  Building2,
-  MapPin,
-} from 'lucide-react'
+import { Search, Plus, MoreHorizontal, Check, X } from 'lucide-react'
 import { Button } from '@shared/ui/button'
 import { Input } from '@shared/ui/input'
 import { Badge } from '@shared/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/ui/card'
+import { Card, CardContent } from '@shared/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,17 +23,7 @@ import {
 } from '../hooks/useUsuarios'
 import type { UsuarioResumenDto } from '../services/usuarioService'
 import type { UserRole } from '@types-app/index'
-import {
-  ROUTES,
-  userDetailPath,
-  userEditPath,
-  empresaEditPath,
-  sucursalEditPath,
-} from '@constants/index'
-import { useEmpresas, useToggleEmpresa } from '@features/empresas/hooks/useEmpresas'
-import type { EmpresaResumenDto } from '@features/empresas/services/empresaService'
-import { useSucursales, useToggleSucursal } from '@features/sucursales/hooks/useSucursales'
-import type { SucursalResumenDto } from '@features/sucursales/services/sucursalService'
+import { ROUTES, userDetailPath, userEditPath } from '@constants/index'
 
 // ── Tipos de presentación ─────────────────────────────────────────────────────
 
@@ -208,47 +188,20 @@ function UserRow({ user, onView, onEdit, onDelete, onToggleStatus, onResetPw }: 
 export function UsersPage() {
   const navigate = useNavigate()
 
-  // Filtros locales para UI
   const [search, setSearch] = useState('')
   const [rolFilter, setRolFilter] = useState<UserRole | 'all'>('all')
-  const [sucursalFilter, setSucursalFilter] = useState<string>('all')
 
-  // Datos del servidor
-  const { data, isLoading } = useUsuarios({
-    pagina: 1,
-    tamanoPagina: 50,
-    sucursalId: sucursalFilter !== 'all' ? sucursalFilter : undefined,
-  })
+  const { data, isLoading } = useUsuarios({ pagina: 1, tamanoPagina: 50 })
   const allUsers = useMemo(() => (data?.items ?? []).map(mapToDisplayUser), [data])
 
   const toggleEstado = useToggleEstadoUsuario()
   const eliminarUsuario = useEliminarUsuario()
   const restablecerContrasena = useRestablecerContrasena()
 
-  // Estados de modales de acciones
   const [deleteTarget, setDeleteTarget] = useState<DisplayUser | null>(null)
   const [statusTarget, setStatusTarget] = useState<DisplayUser | null>(null)
   const [resetPwTarget, setResetPwTarget] = useState<DisplayUser | null>(null)
 
-  // Panel de Empresas y Sucursales
-  const { data: empresasData } = useEmpresas({ tamanoPagina: 100 })
-  const empresas = empresasData?.items ?? []
-  const toggleEmpresa = useToggleEmpresa()
-
-  const [selectedEmpresaPanel, setSelectedEmpresaPanel] = useState<string>('')
-  const empresaSeleccionadaId = selectedEmpresaPanel || empresas[0]?.id || ''
-
-  const { data: sucursalesData } = useSucursales({
-    empresaId: empresaSeleccionadaId || undefined,
-    tamanoPagina: 100,
-  })
-  const sucursales = sucursalesData?.items ?? []
-  const toggleSucursal = useToggleSucursal()
-
-  const [toggleEmpresaTarget, setToggleEmpresaTarget] = useState<EmpresaResumenDto | null>(null)
-  const [toggleSucursalTarget, setToggleSucursalTarget] = useState<SucursalResumenDto | null>(null)
-
-  // Lista filtrada client-side (búsqueda y rol)
   const filtered = useMemo(() => {
     return allUsers.filter((u) => {
       const matchSearch =
@@ -260,7 +213,6 @@ export function UsersPage() {
     })
   }, [allUsers, search, rolFilter])
 
-  // Conteos (total desde el servidor, resto desde items cargados)
   const counts = useMemo(
     () => ({
       total: data?.totalRegistros ?? 0,
@@ -271,13 +223,9 @@ export function UsersPage() {
     [data, allUsers],
   )
 
-  // ── Handlers ────────────────────────────────────────────────────────────────
-
   function handleDelete() {
     if (!deleteTarget) return
-    eliminarUsuario.mutate(deleteTarget.id, {
-      onSuccess: () => setDeleteTarget(null),
-    })
+    eliminarUsuario.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })
   }
 
   function handleToggleStatus() {
@@ -290,28 +238,8 @@ export function UsersPage() {
 
   function handleResetPw() {
     if (!resetPwTarget) return
-    restablecerContrasena.mutate(resetPwTarget.correo, {
-      onSuccess: () => setResetPwTarget(null),
-    })
+    restablecerContrasena.mutate(resetPwTarget.correo, { onSuccess: () => setResetPwTarget(null) })
   }
-
-  function handleToggleEmpresa() {
-    if (!toggleEmpresaTarget) return
-    toggleEmpresa.mutate(
-      { id: toggleEmpresaTarget.id, activa: toggleEmpresaTarget.activa },
-      { onSuccess: () => setToggleEmpresaTarget(null) },
-    )
-  }
-
-  function handleToggleSucursal() {
-    if (!toggleSucursalTarget) return
-    toggleSucursal.mutate(
-      { id: toggleSucursalTarget.id, activa: toggleSucursalTarget.activa },
-      { onSuccess: () => setToggleSucursalTarget(null) },
-    )
-  }
-
-  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-4 p-3 lg:p-4">
@@ -359,7 +287,7 @@ export function UsersPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nombre, correo o sucursal..."
+            placeholder="Buscar por nombre o correo..."
             className="h-8 pl-9 text-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -377,15 +305,6 @@ export function UsersPage() {
             <SelectItem value="tecnico">Técnico</SelectItem>
             <SelectItem value="trabajador">Trabajador</SelectItem>
             <SelectItem value="usuario">Usuario</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={sucursalFilter} onValueChange={setSucursalFilter}>
-          <SelectTrigger className="h-8 w-full text-xs sm:w-48">
-            <SelectValue placeholder="Empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas las empresas</SelectItem>
-            {/* TODO: Cargar empresas desde /empresas cuando el endpoint esté disponible */}
           </SelectContent>
         </Select>
       </div>
@@ -418,204 +337,7 @@ export function UsersPage() {
         </div>
       )}
 
-      {/* Paneles de Empresas y Sucursales */}
-      <div className="grid gap-3 pt-2 lg:grid-cols-2">
-        {/* Panel Empresas */}
-        <Card>
-          <CardHeader className="px-3 pb-2 pt-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Empresas
-                </CardTitle>
-                <CardDescription>Sedes registradas en el sistema</CardDescription>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1.5 text-xs"
-                onClick={() => navigate(ROUTES.EMPRESAS_NEW)}
-              >
-                <Plus className="h-3 w-3" />
-                Nueva empresa
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-2 p-3 pt-0">
-            {empresas.length === 0 ? (
-              <p className="py-4 text-center text-xs text-muted-foreground">
-                No hay empresas registradas.
-              </p>
-            ) : (
-              empresas.map((empresa) => (
-                <div
-                  key={empresa.id}
-                  className="flex items-center justify-between rounded-lg border p-3 text-sm"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Building2 className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{empresa.nombreComercial}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Registrada el {new Date(empresa.createdAt).toLocaleDateString('es-PE')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Badge
-                      className={
-                        empresa.activa
-                          ? 'border-transparent bg-green-100 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : 'border-transparent bg-gray-100 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-                      }
-                    >
-                      {empresa.activa ? 'Activa' : 'Inactiva'}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          aria-label={`Acciones para ${empresa.nombreComercial}`}
-                        >
-                          <MoreHorizontal className="h-3.5 w-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(empresaEditPath(empresa.id))}>
-                          <Pencil className="mr-2 h-3.5 w-3.5" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className={
-                            empresa.activa ? 'text-destructive focus:text-destructive' : ''
-                          }
-                          onClick={() => setToggleEmpresaTarget(empresa)}
-                        >
-                          <Power className="mr-2 h-3.5 w-3.5" />
-                          {empresa.activa ? 'Desactivar' : 'Activar'}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Panel Sucursales */}
-        <Card>
-          <CardHeader className="px-3 pb-2 pt-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Sucursales
-                </CardTitle>
-                <CardDescription>Sucursales por empresa</CardDescription>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 gap-1.5 text-xs"
-                onClick={() => navigate(ROUTES.SUCURSALES_NEW)}
-              >
-                <Plus className="h-3 w-3" />
-                Nueva sucursal
-              </Button>
-            </div>
-            {empresas.length > 0 && (
-              <Select value={empresaSeleccionadaId} onValueChange={setSelectedEmpresaPanel}>
-                <SelectTrigger className="mt-2 h-7 text-xs">
-                  <SelectValue placeholder="Selecciona empresa" />
-                </SelectTrigger>
-                <SelectContent>
-                  {empresas.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>
-                      {e.nombreComercial}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-2 p-3 pt-0">
-            {sucursales.length === 0 ? (
-              <p className="py-4 text-center text-xs text-muted-foreground">
-                {empresaSeleccionadaId
-                  ? 'No hay sucursales para esta empresa.'
-                  : 'Selecciona una empresa para ver sus sucursales.'}
-              </p>
-            ) : (
-              sucursales.map((sucursal) => (
-                <div
-                  key={sucursal.id}
-                  className="flex items-center justify-between rounded-lg border p-3 text-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
-                      <MapPin className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <p className="font-medium">{sucursal.nombre}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Registrada el {new Date(sucursal.createdAt).toLocaleDateString('es-PE')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Badge
-                      className={
-                        sucursal.activa
-                          ? 'border-transparent bg-green-100 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : 'border-transparent bg-gray-100 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-                      }
-                    >
-                      {sucursal.activa ? 'Activa' : 'Inactiva'}
-                    </Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7"
-                          aria-label={`Acciones para ${sucursal.nombre}`}
-                        >
-                          <MoreHorizontal className="h-3.5 w-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(sucursalEditPath(sucursal.id))}>
-                          <Pencil className="mr-2 h-3.5 w-3.5" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className={
-                            sucursal.activa ? 'text-destructive focus:text-destructive' : ''
-                          }
-                          onClick={() => setToggleSucursalTarget(sucursal)}
-                        >
-                          <Power className="mr-2 h-3.5 w-3.5" />
-                          {sucursal.activa ? 'Desactivar' : 'Activar'}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ── Modales de acciones destructivas ──────────────────────────────────── */}
+      {/* ── Modales ───────────────────────────────────────────────────────────── */}
 
       <ConfirmDialog
         open={!!deleteTarget}
@@ -667,44 +389,6 @@ export function UsersPage() {
         confirmLabel="Enviar enlace"
         loading={restablecerContrasena.isPending}
         onConfirm={handleResetPw}
-      />
-
-      <ConfirmDialog
-        open={!!toggleEmpresaTarget}
-        onOpenChange={(open) => {
-          if (!open) setToggleEmpresaTarget(null)
-        }}
-        title={toggleEmpresaTarget?.activa ? 'Desactivar empresa' : 'Activar empresa'}
-        description={
-          toggleEmpresaTarget
-            ? toggleEmpresaTarget.activa
-              ? `¿Deseas desactivar la empresa "${toggleEmpresaTarget.nombreComercial}"? Los usuarios de esta empresa no podrán acceder.`
-              : `¿Deseas activar la empresa "${toggleEmpresaTarget.nombreComercial}"?`
-            : undefined
-        }
-        confirmLabel={toggleEmpresaTarget?.activa ? 'Desactivar' : 'Activar'}
-        variant={toggleEmpresaTarget?.activa ? 'destructive' : 'default'}
-        loading={toggleEmpresa.isPending}
-        onConfirm={handleToggleEmpresa}
-      />
-
-      <ConfirmDialog
-        open={!!toggleSucursalTarget}
-        onOpenChange={(open) => {
-          if (!open) setToggleSucursalTarget(null)
-        }}
-        title={toggleSucursalTarget?.activa ? 'Desactivar sucursal' : 'Activar sucursal'}
-        description={
-          toggleSucursalTarget
-            ? toggleSucursalTarget.activa
-              ? `¿Deseas desactivar la sucursal "${toggleSucursalTarget.nombre}"?`
-              : `¿Deseas activar la sucursal "${toggleSucursalTarget.nombre}"?`
-            : undefined
-        }
-        confirmLabel={toggleSucursalTarget?.activa ? 'Desactivar' : 'Activar'}
-        variant={toggleSucursalTarget?.activa ? 'destructive' : 'default'}
-        loading={toggleSucursal.isPending}
-        onConfirm={handleToggleSucursal}
       />
     </div>
   )
