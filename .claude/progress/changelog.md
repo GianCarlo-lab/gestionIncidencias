@@ -2,6 +2,77 @@
 
 > Cambios significativos del proyecto. Formato: fecha — descripción. Se actualiza tras cada commit.
 
+## 2026-07-24 — Funcionalidad CC en notificaciones de email — implementación fullstack
+
+### Sin commit — pendiente autorización del usuario (SQL + deploy pendientes de ejecución manual)
+
+### Base de datos (SQL pendiente de ejecución en Supabase)
+- Nueva tabla `empresa_correos_copia` — correos fijos en copia por empresa (con empresa_id, correo, nombre_display, activo, auditoría)
+- Nueva columna `tickets.correos_jefe text[]` — captura los correos del jefe al momento de crear el ticket
+
+### Backend — Domain
+- `EmpresaCorreoCopia.cs` — entidad de dominio para correos fijos en copia por empresa
+- Interfaz y repositorio para la entidad `EmpresaCorreoCopia`
+
+### Backend — Application
+- CRUD completo de `empresa_correos_copia`: queries, commands, handlers y validadores en la capa Application
+- `CrearTicketCommand` + `CrearTicketCommandValidator` + handler: campo `CorreosJefe` obligatorio para USUARIO/TRABAJADOR/TECNICO, opcional para ADMIN/SUPERADMIN, máximo 5 correos
+
+### Backend — Infrastructure
+- `IEmailService` + `EmailService` refactorizados: CC real implementada vía campo `cc` de la Brevo API; antes se enviaban N emails separados por destinatario
+- `NotificationOptions.CorreoCopia` eliminado: la configuración global de CC fue reemplazada por la tabla `empresa_correos_copia` en BD
+- 8 handlers de cambio de estado actualizados para consultar y pasar `correosCc` combinados (empresa + jefe del ticket) al servicio de notificaciones
+
+### Backend — API
+- 3 endpoints nuevos en `EmpresasController`:
+  - `GET /api/v1/empresas/{id}/correos-copia` — listar correos en copia de la empresa
+  - `POST /api/v1/empresas/{id}/correos-copia` — agregar correo en copia
+  - `DELETE /api/v1/empresas/{id}/correos-copia/{correoId}` — eliminar correo en copia
+
+### Frontend
+- `EmailChipsInput.tsx` — nuevo componente de entrada de correos tipo chips con validación de formato; reutilizable
+- `CreateTicketPage.tsx` — sección "Supervisores" integrada con `EmailChipsInput` para capturar `correos_jefe` al crear ticket
+- `EmpresaDetailPage.tsx` — nueva card "Correos en copia" con listado + alta + baja de correos fijos
+- `empresaService.ts` + `useEmpresas.ts` — actualizados con métodos para los 3 nuevos endpoints
+
+### Build
+- Backend: 0 errores, 0 advertencias
+- TypeScript: 0 errores
+
+### Pendiente (acción del usuario)
+- Ejecutar las sentencias SQL en Supabase (tabla + columna)
+- Publicar deploy en Render
+
+---
+
+## 2026-07-22 — Módulo Usuarios Fase 2: soporte multi-sucursal completo — commit 37c5a14
+
+### Agregado al repositorio (10 archivos que existían en disco pero no en git)
+
+**Backend — Domain:**
+- `PideServicio.Domain/Entities/UsuarioSucursal.cs` — entidad de dominio usuario-sucursal
+
+**Backend — Application:**
+- `PideServicio.Application/Common/Interfaces/Repositories/IUsuarioSucursalRepository.cs` — interfaz del repositorio
+- `PideServicio.Application/Features/Usuarios/Commands/SucursalAsignacion.cs` — record de entrada compartido
+- `PideServicio.Application/Features/Usuarios/DTOs/SucursalAsignacionDto.cs` — record de salida
+- `PideServicio.Application/Features/Usuarios/Commands/ActualizarSucursalesUsuario/ActualizarSucursalesUsuarioCommand.cs`
+- `PideServicio.Application/Features/Usuarios/Commands/ActualizarSucursalesUsuario/ActualizarSucursalesUsuarioCommandHandler.cs`
+- `PideServicio.Application/Features/Usuarios/Commands/ActualizarSucursalesUsuario/ActualizarSucursalesUsuarioCommandValidator.cs`
+
+**Backend — Persistence:**
+- `PideServicio.Persistence/Repositories/UsuarioSucursalRepository.cs` — implementación con transacción atómica
+
+**Frontend:**
+- `src/features/users/components/SucursalMultiSelector.tsx` — selector múltiple de sucursales
+- `src/features/reports/utils/reporteExcel.ts` — utilidad de exportación Excel
+
+### Impacto
+- Fallo de build en Render corregido (los archivos faltantes impedían la compilación en CI/CD)
+- Funcionalidad multi-sucursal de usuarios operativa de extremo a extremo
+
+---
+
 ## 2026-07-11 — FASE 7.0 Hardening: Auditoría y 35+ correcciones aplicadas
 
 8 agentes especializados auditaron Frontend, Backend, Seguridad (OWASP), Performance, Accesibilidad (WCAG 2.2 AA) y UX. Correcciones críticas: crash silencioso en StatusBadge, roles inválidos en 16 archivos, vulnerabilidad path traversal en upload, [Authorize] faltante en /auth/me, 6 validators faltantes, debounce en búsqueda, lazy loading, compresión HTTP. Sistema al 62% de preparación para producción. Bloqueante principal: L001 (Supabase Auth Hook).

@@ -22,5 +22,16 @@ public sealed class CrearTicketCommandValidator : AbstractValidator<CrearTicketC
 
         RuleFor(x => x.CategoriaId)
             .NotEmpty().WithMessage("La categoría es requerida.");
+
+        When(x => x.CorreosJefe is { Count: > 0 }, () =>
+        {
+            RuleFor(x => x.CorreosJefe)
+                .Must(s => s!.Count <= 5)
+                .WithMessage("Máximo 5 correos de supervisores por ticket.");
+            RuleForEach(x => x.CorreosJefe).ChildRules(s =>
+                s.RuleFor(x => x)
+                    .NotEmpty().WithMessage("El correo no puede estar vacío.")
+                    .EmailAddress().WithMessage("'{PropertyValue}' no es un correo electrónico válido."));
+        });
     }
 }

@@ -18,6 +18,7 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
     private readonly ITicketAsignacionRepository _asignacionRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -31,6 +32,7 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
         ITicketAsignacionRepository asignacionRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -43,6 +45,7 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
         _asignacionRepo = asignacionRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -143,6 +146,13 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
                 }
             }, CancellationToken.None);
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             // Email al técnico y al solicitante — fire-and-forget con try-catch explícito
             var tecnico = await _usuarioRepository.ObtenerPorIdAsync(request.TecnicoId, cancellationToken);
             var solicitante = await _usuarioRepository.ObtenerPorIdAsync(ticket.SolicitanteId, cancellationToken);
@@ -173,6 +183,7 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
                             sucursal: sucursalNombre,
                             area: areaNombre,
                             solicitante: solicitanteNombre,
+                            correosCc: correosCc,
                             cancellationToken: CancellationToken.None);
                     }
                     catch (Exception ex)
@@ -195,6 +206,7 @@ public sealed class AsignarTicketCommandHandler : ICommandHandler<AsignarTicketC
                                 titulo: tituloTicket,
                                 tecnico: nombreTecnico,
                                 prioridad: prioridadTicket,
+                                correosCc: correosCc,
                                 cancellationToken: CancellationToken.None);
                         }
                         catch (Exception ex)

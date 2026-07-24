@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PideServicio.Api.Controllers.Common;
 using PideServicio.Application.Features.Empresas.Commands.ActivarEmpresa;
+using PideServicio.Application.Features.Empresas.Commands.AgregarCorreoCopiaEmpresa;
 using PideServicio.Application.Features.Empresas.Commands.CreateEmpresa;
 using PideServicio.Application.Features.Empresas.Commands.DesactivarEmpresa;
+using PideServicio.Application.Features.Empresas.Commands.EliminarCorreoCopiaEmpresa;
 using PideServicio.Application.Features.Empresas.Commands.UpdateEmpresa;
 using PideServicio.Application.Features.Empresas.DTOs;
 using PideServicio.Application.Features.Empresas.Queries.GetEmpresaById;
+using PideServicio.Application.Features.Empresas.Queries.GetCorreosCopiaEmpresa;
 using PideServicio.Application.Features.Empresas.Queries.ListEmpresas;
 using PideServicio.Contracts.Common;
 
@@ -111,6 +114,41 @@ public sealed class EmpresasController : ApiControllerBase
         var result = await Mediator.Send(new DesactivarEmpresaCommand(id), ct);
         return HandleResult(result);
     }
+
+    /// <summary>Lista los correos en copia configurados para la empresa. Solo Admin de la empresa o SuperAdmin.</summary>
+    [HttpGet("{id:guid}/correos-copia")]
+    [Authorize(Policy = "Autenticado")]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EmpresaCorreoCopiaDto>>), 200)]
+    [ProducesResponseType(typeof(ApiResponse), 403)]
+    public async Task<IActionResult> ListarCorreosCopia(Guid id, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new GetCorreosCopiaEmpresaQuery(id), ct);
+        return HandleResult(result);
+    }
+
+    /// <summary>Agrega un correo en copia para la empresa. Solo Admin de la empresa o SuperAdmin.</summary>
+    [HttpPost("{id:guid}/correos-copia")]
+    [Authorize(Policy = "Autenticado")]
+    [ProducesResponseType(typeof(ApiResponse<Guid>), 201)]
+    [ProducesResponseType(typeof(ApiResponse), 403)]
+    [ProducesResponseType(typeof(ApiResponse), 422)]
+    public async Task<IActionResult> AgregarCorreoCopia(Guid id, [FromBody] AgregarCorreoCopiaRequest request, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new AgregarCorreoCopiaEmpresaCommand(id, request.Correo), ct);
+        return HandleResult(result);
+    }
+
+    /// <summary>Elimina un correo en copia de la empresa. Solo Admin de la empresa o SuperAdmin.</summary>
+    [HttpDelete("{id:guid}/correos-copia/{correoId:guid}")]
+    [Authorize(Policy = "Autenticado")]
+    [ProducesResponseType(typeof(ApiResponse), 200)]
+    [ProducesResponseType(typeof(ApiResponse), 403)]
+    [ProducesResponseType(typeof(ApiResponse), 404)]
+    public async Task<IActionResult> EliminarCorreoCopia(Guid id, Guid correoId, CancellationToken ct)
+    {
+        var result = await Mediator.Send(new EliminarCorreoCopiaEmpresaCommand(correoId, id), ct);
+        return HandleResult(result);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -133,3 +171,5 @@ public sealed record UpdateEmpresaRequest(
     string? LogoUrl,
     string? ColorPrimario,
     string? ColorSecundario);
+
+public sealed record AgregarCorreoCopiaRequest(string Correo);

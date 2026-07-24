@@ -18,6 +18,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
     private readonly ITicketAsignacionRepository _asignacionRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -31,6 +32,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
         ITicketAsignacionRepository asignacionRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -43,6 +45,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
         _asignacionRepo = asignacionRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -169,6 +172,13 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
                 }
             }, CancellationToken.None);
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             // Emails — fire-and-forget con try-catch explícito
             var nuevoTecnico = await _usuarioRepository.ObtenerPorIdAsync(request.NuevoTecnicoId, cancellationToken);
             var solicitante = await _usuarioRepository.ObtenerPorIdAsync(ticket.SolicitanteId, cancellationToken);
@@ -199,6 +209,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
                                 codigo: codigoTicket,
                                 titulo: tituloTicket,
                                 motivo: motivo,
+                                correosCc: correosCc,
                                 cancellationToken: CancellationToken.None);
                         }
                         catch (Exception ex)
@@ -229,6 +240,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
                             sucursal: sucursalNombre,
                             area: areaNombre,
                             solicitante: solicitanteNombre,
+                            correosCc: correosCc,
                             cancellationToken: CancellationToken.None);
                     }
                     catch (Exception ex)
@@ -250,6 +262,7 @@ public sealed class ReasignarTicketCommandHandler : ICommandHandler<ReasignarTic
                                 titulo: tituloTicket,
                                 tecnico: nombreNuevoTecnico,
                                 prioridad: prioridadTicket,
+                                correosCc: correosCc,
                                 cancellationToken: CancellationToken.None);
                         }
                         catch (Exception ex)

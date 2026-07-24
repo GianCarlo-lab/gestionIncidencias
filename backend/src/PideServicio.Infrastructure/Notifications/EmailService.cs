@@ -9,6 +9,11 @@ using PideServicio.Application.Common.Interfaces;
 
 public sealed class EmailService : IEmailService
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+    };
+
     private readonly NotificationOptions _options;
     private readonly HttpClient _httpClient;
     private readonly ILogger<EmailService> _logger;
@@ -44,7 +49,7 @@ public sealed class EmailService : IEmailService
 
         try
         {
-            await EnviarViaBrevoAsync(destinatario, asunto, cuerpoHtml, cuerpoTexto, ct);
+            await EnviarViaBrevoAsync(destinatario, asunto, cuerpoHtml, cuerpoTexto, null, ct);
             _logger.LogInformation("Email enviado a {Destinatario}: {Asunto}", destinatario, asunto);
         }
         catch (Exception ex)
@@ -100,12 +105,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketCreadoAsync(
         string correoSolicitante, string codigo, string? titulo,
         string prioridad, string area, string solicitante,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketCreado(codigo, titulo, prioridad, area, solicitante);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -118,12 +124,13 @@ public sealed class EmailService : IEmailService
         string correoTecnico, string codigo, string? titulo,
         string tecnico, string prioridad,
         string? sucursal = null, string? area = null, string? solicitante = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketAsignado(codigo, titulo, tecnico, prioridad, sucursal, area, solicitante);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -136,12 +143,13 @@ public sealed class EmailService : IEmailService
         string correoTecnico, string codigo, string? titulo,
         string tecnico, string prioridad,
         string? motivo = null, string? sucursal = null, string? area = null, string? solicitante = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketReasignado(codigo, titulo, tecnico, prioridad, motivo, sucursal, area, solicitante);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -153,12 +161,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarAsignacionASolicitanteAsync(
         string correoSolicitante, string codigo, string? titulo,
         string tecnico, string prioridad,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketAsignadoSolicitante(codigo, titulo, tecnico, prioridad);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -170,12 +179,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketPendienteValidacionAsync(
         string correoSolicitante, string codigo, string? titulo,
         string tecnico,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketPendienteValidacion(codigo, titulo, tecnico);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -187,12 +197,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketCerradoAsync(
         string correoSolicitante, string codigo, string? titulo,
         string? valoracion,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketCerrado(codigo, titulo, valoracion);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -204,12 +215,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketCerradoTecnicoAsync(
         string correoTecnico, string codigo, string? titulo,
         string? valoracion,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketCerradoTecnico(codigo, titulo, valoracion);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -221,12 +233,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketReabiertoAsync(
         string correoTecnico, string codigo, string? titulo,
         string motivo,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketReabierto(codigo, titulo, motivo);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -238,12 +251,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketCanceladoAsync(
         string correoSolicitante, string codigo, string? titulo,
         string motivo,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketCancelado(codigo, titulo, motivo);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -255,12 +269,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarTicketEnProcesoAsync(
         string correoSolicitante, string codigo, string? titulo,
         string? tecnico = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.TicketEnProceso(codigo, titulo, tecnico);
-            return EnviarConCopiaAsync(correoSolicitante, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoSolicitante, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -272,12 +287,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarDesasignacionTecnicoAsync(
         string correoTecnico, string codigo, string? titulo,
         string? motivo = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.DesasignacionTecnico(codigo, titulo, motivo);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -289,12 +305,13 @@ public sealed class EmailService : IEmailService
     public Task NotificarCambioPrioridadTecnicoAsync(
         string correoTecnico, string codigo, string? titulo,
         string prioridadAnterior, string prioridadNueva,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var (asunto, html) = EmailTemplates.CambioPrioridadTecnico(codigo, titulo, prioridadAnterior, prioridadNueva);
-            return EnviarConCopiaAsync(correoTecnico, asunto, html, cancellationToken);
+            return EnviarConCopiaAsync(correoTecnico, asunto, html, correosCc, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -305,43 +322,67 @@ public sealed class EmailService : IEmailService
 
     // -------------------------------------------------------------------------
 
-    private Task EnviarConCopiaAsync(string destinatarioPrincipal, string asunto, string html, CancellationToken ct)
+    private async Task EnviarConCopiaAsync(
+        string destinatarioPrincipal, string asunto, string html,
+        IReadOnlyList<string>? correosCc = null,
+        CancellationToken ct = default)
     {
-        var destinatarios = new List<string> { destinatarioPrincipal };
-        if (!string.IsNullOrWhiteSpace(_options.CorreoCopia))
-            destinatarios.Add(_options.CorreoCopia);
-
-        return EnviarAVariosAsync(destinatarios, asunto, html, ct: ct);
+        if (!_options.EmailHabilitado)
+        {
+            _logger.LogWarning("Email deshabilitado. Se omite envío a {Destinatario}: {Asunto}", destinatarioPrincipal, asunto);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_options.BrevoApiKey))
+        {
+            _logger.LogWarning("Brevo API key no configurada. Se omite envío a {Destinatario}", destinatarioPrincipal);
+            return;
+        }
+        try
+        {
+            await EnviarViaBrevoAsync(destinatarioPrincipal, asunto, html, null, correosCc, ct);
+            _logger.LogInformation("Email enviado a {Destinatario}: {Asunto}", destinatarioPrincipal, asunto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al enviar email a {Destinatario}: {Asunto}", destinatarioPrincipal, asunto);
+        }
     }
 
     private async Task EnviarViaBrevoAsync(
-        string destinatario, string asunto, string htmlContent, string? cuerpoTexto, CancellationToken ct)
+        string destinatario, string asunto, string htmlContent, string? cuerpoTexto,
+        IReadOnlyList<string>? correosCc = null,
+        CancellationToken ct = default)
     {
         _logger.LogWarning("[Brevo] Intentando envío a {Destinatario} — asunto: {Asunto}", destinatario, asunto);
 
-        // textContent: nunca vacío para evitar filtros de spam y rechazos de Brevo
-        var textoPlano = !string.IsNullOrWhiteSpace(cuerpoTexto)
-            ? cuerpoTexto
-            : StripHtml(htmlContent);
-        if (string.IsNullOrWhiteSpace(textoPlano))
-            textoPlano = asunto;
+        var textoPlano = !string.IsNullOrWhiteSpace(cuerpoTexto) ? cuerpoTexto : StripHtml(htmlContent);
+        if (string.IsNullOrWhiteSpace(textoPlano)) textoPlano = asunto;
 
         var remitente = string.IsNullOrWhiteSpace(_options.RemitenteDireccion)
-            ? _options.SmtpUsuario  // fallback a usuario SMTP por compatibilidad histórica
+            ? _options.SmtpUsuario
             : _options.RemitenteDireccion;
 
-        var payload = new
-        {
-            sender = new { name = _options.RemitenteNombre, email = remitente },
-            to = new[] { new { email = destinatario } },
-            subject = asunto,
-            htmlContent = htmlContent,
-            textContent = textoPlano,
-        };
+        var ccArray = correosCc?
+            .Where(c => !string.IsNullOrWhiteSpace(c) &&
+                        !string.Equals(c, destinatario, StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(c => new { email = c })
+            .ToArray();
 
-        var json = JsonSerializer.Serialize(payload);
+        // Build payload as dictionary to handle conditional cc field cleanly
+        var payloadDict = new System.Collections.Generic.Dictionary<string, object?>
+        {
+            ["sender"] = new { name = _options.RemitenteNombre, email = remitente },
+            ["to"] = new[] { new { email = destinatario } },
+            ["subject"] = asunto,
+            ["htmlContent"] = htmlContent,
+            ["textContent"] = textoPlano,
+        };
+        if (ccArray is { Length: > 0 })
+            payloadDict["cc"] = ccArray;
+
+        var json = JsonSerializer.Serialize(payloadDict, _jsonOptions);
         using var request = new HttpRequestMessage(HttpMethod.Post, "smtp/email");
-        // api-key se agrega por request (no en AddHttpClient) para leer desde IOptions en tiempo de ejecución
         request.Headers.Add("api-key", _options.BrevoApiKey);
         request.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -356,7 +397,6 @@ public sealed class EmailService : IEmailService
             _logger.LogError(
                 "Brevo API respondió {StatusCode} al enviar a {Destinatario} — asunto: {Asunto}. Detalle Brevo: {BrevoError}",
                 (int)response.StatusCode, destinatario, asunto, cuerpoError);
-            // Lanzar para que EnviarAsync registre también el contexto del llamador
             response.EnsureSuccessStatusCode();
         }
     }

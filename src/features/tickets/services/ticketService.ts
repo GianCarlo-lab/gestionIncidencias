@@ -95,6 +95,7 @@ export const ticketService = {
     categoriaId: string
     prioridad: string
     ubicacion?: string
+    correosJefe?: string[]
   }) => apiClient.post<string>('/tickets', body),
 
   asignar: (ticketId: string, tecnicoId: string) =>

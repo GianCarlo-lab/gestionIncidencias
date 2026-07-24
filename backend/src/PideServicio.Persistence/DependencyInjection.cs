@@ -26,6 +26,7 @@ public static class DependencyInjection
 
         // Fase 6.1 — Entidades base
         services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+        services.AddScoped<IEmpresaCorreoCopiaRepository, EmpresaCorreoCopiaRepository>();
         services.AddScoped<ISucursalRepository, SucursalRepository>();
         services.AddScoped<IAreaRepository, AreaRepository>();
 

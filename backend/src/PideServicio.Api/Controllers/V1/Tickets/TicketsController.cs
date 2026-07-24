@@ -89,7 +89,8 @@ public sealed class TicketsController : ApiControllerBase
             request.TipoServicioId,
             request.CategoriaId,
             request.Prioridad,
-            request.Ubicacion);
+            request.Ubicacion,
+            CorreosJefe: request.CorreosJefe);
 
         var result = await Mediator.Send(command, ct);
         return HandleCreated(result, "GetTicketById", new { id = result.Valor });
@@ -266,7 +267,8 @@ public sealed record CrearTicketRequest(
     Guid TipoServicioId,
     Guid CategoriaId,
     PrioridadTipo Prioridad,
-    string? Ubicacion);
+    string? Ubicacion,
+    IReadOnlyList<string>? CorreosJefe = null);
 
 /// <summary>Payload para asignar un ticket a un técnico.</summary>
 public sealed record AsignarTicketRequest(Guid TecnicoId);

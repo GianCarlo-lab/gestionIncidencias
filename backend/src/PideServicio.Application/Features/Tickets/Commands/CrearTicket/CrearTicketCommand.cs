@@ -11,5 +11,6 @@ public sealed record CrearTicketCommand(
     Guid TipoServicioId,
     Guid CategoriaId,
     PrioridadTipo Prioridad,
-    string? Ubicacion
+    string? Ubicacion,
+    IReadOnlyList<string>? CorreosJefe = null
 ) : ICommand<Guid>;

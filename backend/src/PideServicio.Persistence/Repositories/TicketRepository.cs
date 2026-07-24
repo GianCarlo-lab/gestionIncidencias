@@ -63,6 +63,7 @@ public sealed class TicketRepository : ITicketRepository
         public DateTimeOffset? FechaCierre { get; init; }
         public DateTimeOffset? FechaCancelacion { get; init; }
         public int Version { get; init; }
+        public string[] CorreosJefe { get; init; } = [];
         public DateTimeOffset CreatedAt { get; init; }
         public DateTimeOffset? UpdatedAt { get; init; }
         public Guid? CreatedBy { get; init; }
@@ -104,6 +105,7 @@ public sealed class TicketRepository : ITicketRepository
         fecha_cierre                    AS "FechaCierre",
         fecha_cancelacion               AS "FechaCancelacion",
         version                         AS "Version",
+        correos_jefe                    AS "CorreosJefe",
         created_at                      AS "CreatedAt",
         updated_at                      AS "UpdatedAt",
         created_by                      AS "CreatedBy",
@@ -341,6 +343,7 @@ public sealed class TicketRepository : ITicketRepository
                 empresa_id, sucursal_id, area_id, tipo_servicio_id, categoria_id,
                 prioridad_solicitante, prioridad_admin, prioridad_efectiva,
                 estado, solicitante_id, tecnico_id, ubicacion,
+                correos_jefe,
                 fecha_creacion, version, created_at, updated_at, created_by, updated_by)
             VALUES (
                 @Id, @Codigo, @Titulo, @Descripcion,
@@ -350,6 +353,7 @@ public sealed class TicketRepository : ITicketRepository
                 @PrioridadEfectiva::prioridad_tipo,
                 @Estado::ticket_estado_tipo,
                 @SolicitanteId, @TecnicoId, @Ubicacion,
+                @CorreosJefe,
                 @FechaCreacion, @Version, @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy)
             RETURNING id
             """;
@@ -372,6 +376,7 @@ public sealed class TicketRepository : ITicketRepository
             ticket.SolicitanteId,
             ticket.TecnicoId,
             ticket.Ubicacion,
+            CorreosJefe        = ticket.CorreosJefe,
             ticket.FechaCreacion,
             ticket.Version,
             ticket.CreatedAt,
@@ -532,6 +537,7 @@ public sealed class TicketRepository : ITicketRepository
         EntityReconstituter.Set(entity, "FechaCierre",              r.FechaCierre);
         EntityReconstituter.Set(entity, "FechaCancelacion",         r.FechaCancelacion);
         EntityReconstituter.Set(entity, "Version",                  r.Version);
+        EntityReconstituter.Set(entity, "CorreosJefe",              r.CorreosJefe ?? Array.Empty<string>());
 
         return entity;
     }

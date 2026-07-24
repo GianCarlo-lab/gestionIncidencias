@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shar
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select'
 import { FormField } from '@shared/components/FormField'
 import { SearchableSelect } from '@shared/components/SearchableSelect'
+import { EmailChipsInput } from '@shared/components/EmailChipsInput'
 import { useAuthStore } from '@store/auth.store'
 import { ROUTES } from '@constants/index'
 import { empresaService } from '@features/empresas/services/empresaService'
@@ -81,10 +82,13 @@ export function CreateTicketPage() {
   const [submitted, setSubmitted] = useState(false)
   const [createdCode, setCreatedCode] = useState<string>('')
   const [attachments, setAttachments] = useState<AttachedFile[]>([])
+  const [correosJefe, setCorreosJefe] = useState<string[]>([])
+  const [correosJefeError, setCorreosJefeError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isSuperAdmin = user?.rol === 'superadmin'
   const isAdmin = user?.rol === 'admin'
+  const requiereCorreosJefe = ['usuario', 'trabajador', 'tecnico'].includes(user?.rol ?? '')
 
   // SUPERADMIN empieza sin empresa seleccionada; los demás roles usan la suya
   const [selectedEmpresaId, setSelectedEmpresaId] = useState<string>(
@@ -151,6 +155,12 @@ export function CreateTicketPage() {
   }
 
   const onSubmit = async (data: CreateTicketForm) => {
+    if (requiereCorreosJefe && correosJefe.length === 0) {
+      setCorreosJefeError('Agrega al menos un correo del jefe o supervisor.')
+      return
+    }
+    setCorreosJefeError(null)
+
     let ticketId: string
     try {
       ticketId = await crearTicket.mutateAsync({
@@ -162,6 +172,7 @@ export function CreateTicketPage() {
         categoriaId: data.categoriaId,
         prioridad: data.priority.toUpperCase(),
         ubicacion: data.location,
+        ...(correosJefe.length > 0 ? { correosJefe } : {}),
       })
     } catch (err) {
       toast.error(
@@ -558,6 +569,40 @@ export function CreateTicketPage() {
                 </p>
               </div>
             </button>
+          </CardContent>
+        </Card>
+
+        {/* ── Notificaciones adicionales ───────────────────────────────── */}
+        <Card>
+          <CardHeader className="px-3 pb-2 pt-3">
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Supervisores
+              {!requiereCorreosJefe && (
+                <span className="ml-1 text-[10px] font-normal normal-case tracking-normal text-muted-foreground">
+                  (Opcional)
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 p-3 pt-0">
+            <FormField
+              label="Correos del jefe / supervisor"
+              required={requiereCorreosJefe}
+              error={correosJefeError ?? undefined}
+            >
+              <p className="mb-2 text-[11px] text-muted-foreground">
+                Recibirán copia de todas las notificaciones relacionadas con este ticket.
+              </p>
+              <EmailChipsInput
+                value={correosJefe}
+                onChange={(emails) => {
+                  setCorreosJefe(emails)
+                  if (emails.length > 0) setCorreosJefeError(null)
+                }}
+                maxItems={5}
+                error={correosJefeError ?? undefined}
+              />
+            </FormField>
           </CardContent>
         </Card>
 

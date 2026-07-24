@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PideServicio.Architecture.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+192fc3da8bb95251be6ce2fc616f4e8903da878e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8721a2bf795e49570aef3ce43dd91d70f1af2068")]
 [assembly: System.Reflection.AssemblyProductAttribute("PideServicio.Architecture.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PideServicio.Architecture.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

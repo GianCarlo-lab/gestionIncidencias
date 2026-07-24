@@ -2,6 +2,67 @@
 
 > Registro acumulativo. Se añade al final; no se borra.
 
+## Funcionalidad CC en Notificaciones de Email (2026-07-24)
+
+### Base de datos (SQL pendiente de ejecución manual por el usuario)
+
+- Nueva tabla `empresa_correos_copia` — correos fijos en copia por empresa
+- Nueva columna `tickets.correos_jefe text[]` — correos del jefe capturados al crear el ticket
+
+### Backend (.NET — build: 0 errores, 0 advertencias)
+
+**Domain:**
+- `EmpresaCorreoCopia.cs` — entidad de dominio + interfaz + repositorio
+
+**Application:**
+- CRUD completo (`EmpresaCorreoCopia`): queries, commands y handlers en la capa Application
+- `CrearTicketCommand` + validator + handler: campo `CorreosJefe` obligatorio para USUARIO/TRABAJADOR/TECNICO, opcional para ADMIN/SUPERADMIN, máximo 5 correos
+
+**Infrastructure:**
+- `IEmailService` y `EmailService` refactorizados: CC real vía campo `cc` de la Brevo API (antes enviaba N emails separados)
+- `NotificationOptions.CorreoCopia` eliminado (configuración global reemplazada por BD por empresa)
+- 8 handlers de cambio de estado actualizados para pasar `correosCc` a las notificaciones
+
+**API:**
+- 3 endpoints nuevos en `EmpresasController`: `GET /empresas/{id}/correos-copia`, `POST /empresas/{id}/correos-copia`, `DELETE /empresas/{id}/correos-copia/{correoId}`
+
+### Frontend (TypeScript: 0 errores)
+
+- `EmailChipsInput.tsx` — nuevo componente de entrada de correos tipo chips (reutilizable)
+- `CreateTicketPage.tsx` — nueva sección "Supervisores" que usa `EmailChipsInput`
+- `EmpresaDetailPage.tsx` — nueva card de "Correos en copia" con gestión CRUD
+- `empresaService.ts` y `useEmpresas.ts` — actualizados con los 3 nuevos endpoints
+
+**Estado:** COMPLETADO — implementación fullstack completa. Falta: ejecutar SQL en Supabase (manual por el usuario) y hacer el deploy.
+
+---
+
+## Módulo Usuarios — Fase 2: Soporte Multi-Sucursal (2026-07-22) — commit 37c5a14
+
+### Backend
+
+- `UsuarioSucursal.cs` — entidad de dominio para la relación usuario-sucursal
+- `IUsuarioSucursalRepository.cs` — interfaz del repositorio en Application
+- `UsuarioSucursalRepository.cs` — implementación con transacción atómica (borrado + inserción en un solo UoW)
+- `SucursalAsignacion.cs` — record de entrada compartido para el comando
+- `SucursalAsignacionDto.cs` — record de salida (DTO de respuesta)
+- `ActualizarSucursalesUsuarioCommand.cs` — comando CQRS
+- `ActualizarSucursalesUsuarioCommandHandler.cs` — handler del comando
+- `ActualizarSucursalesUsuarioCommandValidator.cs` — validador FluentValidation
+
+### Frontend
+
+- `SucursalMultiSelector.tsx` — componente React para selección múltiple de sucursales en la UI de usuarios
+- `reporteExcel.ts` — utilidad de exportación Excel para el módulo de reportes
+
+### Fix de deploy
+
+Los 10 archivos existían en disco pero no estaban trackeados en git. Su ausencia causaba fallo de build en Render. El commit 37c5a14 los agrega al repositorio y corrige el pipeline de CI/CD.
+
+**Estado:** COMPLETADO — funcionalidad multi-sucursal de usuarios operativa (endpoint, repositorio, validación, UI).
+
+---
+
 ## FASE 7.0 — Hardening y Estabilización RC (2026-07-11)
 
 ### Auditoría completada por 8 agentes especializados

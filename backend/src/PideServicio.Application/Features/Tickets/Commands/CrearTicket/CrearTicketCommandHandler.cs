@@ -18,6 +18,7 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
     private readonly ISucursalRepository _sucursalRepository;
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -30,6 +31,7 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
         ISucursalRepository sucursalRepository,
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -41,6 +43,7 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
         _sucursalRepository = sucursalRepository;
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -57,6 +60,10 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
             ? await _usuarioRepository.ObtenerPorIdAsync(claims.Id, cancellationToken)
             : await _usuarioRepository.ObtenerPorAuthIdAsync(claims.AuthId, cancellationToken);
         if (actor is null || !actor.Activo) return Result.NoAutorizado<Guid>();
+
+        var rolesObligatorios = new[] { RolTipo.USUARIO, RolTipo.TRABAJADOR, RolTipo.TECNICO };
+        if (rolesObligatorios.Contains(actor.Rol) && (request.CorreosJefe is null || request.CorreosJefe.Count == 0))
+            return Result.Fallo<Guid>("Debes ingresar al menos un correo del jefe o supervisor para registrar el ticket.");
 
         try
         {
@@ -94,7 +101,8 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
                 request.Prioridad,
                 actor.Id,
                 request.Ubicacion,
-                actor.Id);
+                actor.Id,
+                correosJefe: request.CorreosJefe);
 
             ticket.SubmitParaAsignacion(actor.Id);
 
@@ -166,6 +174,13 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
 
             var sucursalCaptura = sucursalNombre;
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(empresaIdCaptura, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(request.CorreosJefe ?? [])
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             // Correo al solicitante — fire-and-forget
             _ = Task.Run(async () =>
             {
@@ -178,6 +193,7 @@ public sealed class CrearTicketCommandHandler : ICommandHandler<CrearTicketComma
                         prioridad: prioridadTicket,
                         area: areaNombreCaptura,
                         solicitante: solicitanteNombre,
+                        correosCc: correosCc,
                         cancellationToken: CancellationToken.None);
                 }
                 catch (Exception ex)

@@ -46,6 +46,13 @@ export interface ActualizarEmpresaDto {
   colorSecundario?: string
 }
 
+export interface EmpresaCorreoCopiaDto {
+  id: string
+  correo: string
+  activo: boolean
+  createdAt: string
+}
+
 type Params = Record<string, string | number | boolean | null | undefined>
 
 export const empresaService = {
@@ -62,4 +69,13 @@ export const empresaService = {
   activar: (id: string) => apiClient.patch<void>(`/empresas/${id}/activar`),
 
   desactivar: (id: string) => apiClient.patch<void>(`/empresas/${id}/desactivar`),
+
+  listarCorreosCopia: (empresaId: string) =>
+    apiClient.get<EmpresaCorreoCopiaDto[]>(`/empresas/${empresaId}/correos-copia`),
+
+  agregarCorreoCopia: (empresaId: string, correo: string) =>
+    apiClient.post<{ value: string }>(`/empresas/${empresaId}/correos-copia`, { correo }),
+
+  eliminarCorreoCopia: (empresaId: string, correoId: string) =>
+    apiClient.delete(`/empresas/${empresaId}/correos-copia/${correoId}`),
 }

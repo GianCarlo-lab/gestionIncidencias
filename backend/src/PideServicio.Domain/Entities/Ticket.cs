@@ -40,6 +40,7 @@ public sealed class Ticket : AggregateRoot
     public DateTimeOffset? FechaCierre { get; private set; }
     public DateTimeOffset? FechaCancelacion { get; private set; }
     public int Version { get; private set; } = 1;
+    public string[] CorreosJefe { get; private set; } = [];
 
     public bool EstaEnEstadoTerminal => Estado is TicketEstadoTipo.CERRADO or TicketEstadoTipo.CANCELADO;
 
@@ -57,7 +58,8 @@ public sealed class Ticket : AggregateRoot
         PrioridadTipo prioridadSolicitante,
         Guid solicitanteId,
         string? ubicacion = null,
-        Guid? creadoPor = null)
+        Guid? creadoPor = null,
+        IReadOnlyList<string>? correosJefe = null)
     {
         var codigoVo = TicketCodigo.Crear(codigo);
         var ahora = DateTimeOffset.UtcNow;
@@ -82,7 +84,10 @@ public sealed class Ticket : AggregateRoot
             Version = 1,
             CreatedAt = ahora,
             UpdatedAt = ahora,
-            CreatedBy = creadoPor ?? solicitanteId
+            CreatedBy = creadoPor ?? solicitanteId,
+            CorreosJefe = correosJefe?.Where(c => !string.IsNullOrWhiteSpace(c))
+                              .Distinct(StringComparer.OrdinalIgnoreCase)
+                              .ToArray() ?? []
         };
 
         ticket.AgregarEvento(new TicketCreadoEvent(

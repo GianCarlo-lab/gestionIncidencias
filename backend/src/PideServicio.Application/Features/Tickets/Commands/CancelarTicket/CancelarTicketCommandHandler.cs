@@ -16,6 +16,7 @@ public sealed class CancelarTicketCommandHandler : ICommandHandler<CancelarTicke
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
     private readonly IMotivoCancelacionRepository _motivoCancelacionRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -27,6 +28,7 @@ public sealed class CancelarTicketCommandHandler : ICommandHandler<CancelarTicke
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
         IMotivoCancelacionRepository motivoCancelacionRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -37,6 +39,7 @@ public sealed class CancelarTicketCommandHandler : ICommandHandler<CancelarTicke
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
         _motivoCancelacionRepo = motivoCancelacionRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -166,6 +169,13 @@ public sealed class CancelarTicketCommandHandler : ICommandHandler<CancelarTicke
                 }
             }, CancellationToken.None);
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             // Email al solicitante con el motivo de cancelación — fire-and-forget con try-catch explícito
             var correoSolicitante = esSolicitante
                 ? actor.Correo.Valor
@@ -188,6 +198,7 @@ public sealed class CancelarTicketCommandHandler : ICommandHandler<CancelarTicke
                             codigo: codigoTicket,
                             titulo: tituloTicket,
                             motivo: motivoTexto,
+                            correosCc: correosCc,
                             cancellationToken: CancellationToken.None);
                     }
                     catch (Exception ex)

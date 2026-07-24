@@ -11,6 +11,7 @@ const EMPRESA_KEYS = {
   all: ['empresas'] as const,
   list: (params?: EmpresaListParams) => ['empresas', 'list', params] as const,
   detail: (id: string) => ['empresas', 'detail', id] as const,
+  correosCopia: (id: string) => ['empresas', 'correosCopia', id] as const,
 }
 
 export function useEmpresas(params?: EmpresaListParams) {
@@ -70,6 +71,43 @@ export function useToggleEmpresa() {
     },
     onError: (err: Error) => {
       toast.error(err.message)
+    },
+  })
+}
+
+export function useCorreosCopiaEmpresa(empresaId: string) {
+  return useQuery({
+    queryKey: EMPRESA_KEYS.correosCopia(empresaId),
+    queryFn: () => empresaService.listarCorreosCopia(empresaId),
+    enabled: !!empresaId,
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+export function useAgregarCorreoCopia(empresaId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (correo: string) => empresaService.agregarCorreoCopia(empresaId, correo),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: EMPRESA_KEYS.correosCopia(empresaId) })
+      toast.success('Correo en copia agregado.')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'No se pudo agregar el correo.')
+    },
+  })
+}
+
+export function useEliminarCorreoCopia(empresaId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (correoId: string) => empresaService.eliminarCorreoCopia(empresaId, correoId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: EMPRESA_KEYS.correosCopia(empresaId) })
+      toast.success('Correo en copia eliminado.')
+    },
+    onError: () => {
+      toast.error('No se pudo eliminar el correo.')
     },
   })
 }

@@ -4,6 +4,25 @@
 
 ---
 
+## CC en Notificaciones de Email — IMPLEMENTADO, pendiente deploy y SQL (2026-07-24)
+
+La funcionalidad de copia (CC) en emails está implementada de extremo a extremo (ver `completed.md`). Quedan dos acciones que el usuario ejecuta manualmente:
+
+- [ ] **Ejecutar SQL en Supabase:** crear la tabla `empresa_correos_copia` y agregar la columna `tickets.correos_jefe text[]`.
+- [ ] **Deploy:** publicar el backend actualizado en Render (o el entorno de producción configurado).
+
+Una vez ejecutado el SQL y hecho el deploy, la funcionalidad estará operativa en producción.
+
+---
+
+## Módulo Usuarios — Estado: COMPLETADO (2026-07-22)
+
+El soporte multi-sucursal de usuarios está implementado y commiteado (commit 37c5a14). Incluye entidad de dominio, repositorio con transacción atómica, comando CQRS con validador, DTOs y componente frontend `SucursalMultiSelector`. El fallo de build en Render fue corregido al agregar los 10 archivos que faltaban en git.
+
+**Próxima acción:** Definir con el usuario qué módulo se implementa a continuación.
+
+---
+
 ## FASE 6 — MÓDULOS BACKEND
 
 ### FASE 6.1 — ARQUITECTURA — COMPLETADA (2026-07-10)

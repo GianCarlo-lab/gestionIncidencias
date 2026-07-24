@@ -15,6 +15,7 @@ public sealed class CambiarPrioridadCommandHandler : ICommandHandler<CambiarPrio
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -25,6 +26,7 @@ public sealed class CambiarPrioridadCommandHandler : ICommandHandler<CambiarPrio
         IUsuarioRepository usuarioRepository,
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -34,6 +36,7 @@ public sealed class CambiarPrioridadCommandHandler : ICommandHandler<CambiarPrio
         _usuarioRepository = usuarioRepository;
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -81,6 +84,13 @@ public sealed class CambiarPrioridadCommandHandler : ICommandHandler<CambiarPrio
                 new { Prioridad = prioridadAnterior.ToString() },
                 new { Prioridad = ticket.PrioridadEfectiva.ToString() },
                 cancellationToken);
+
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             // Notificación push al técnico asignado — fire-and-forget con try-catch explícito
             if (ticket.TecnicoId.HasValue)
@@ -130,6 +140,7 @@ public sealed class CambiarPrioridadCommandHandler : ICommandHandler<CambiarPrio
                                 titulo: tituloTicket,
                                 prioridadAnterior: prioridadAnteriorStr,
                                 prioridadNueva: prioridadNuevaStr,
+                                correosCc: correosCc,
                                 cancellationToken: CancellationToken.None);
                         }
                         catch (Exception ex)

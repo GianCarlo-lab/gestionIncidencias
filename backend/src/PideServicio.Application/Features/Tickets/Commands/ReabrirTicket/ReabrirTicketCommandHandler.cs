@@ -16,6 +16,7 @@ public sealed class ReabrirTicketCommandHandler : ICommandHandler<ReabrirTicketC
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
     private readonly IMotivoRechazoRepository _motivoRechazoRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -27,6 +28,7 @@ public sealed class ReabrirTicketCommandHandler : ICommandHandler<ReabrirTicketC
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
         IMotivoRechazoRepository motivoRechazoRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -37,6 +39,7 @@ public sealed class ReabrirTicketCommandHandler : ICommandHandler<ReabrirTicketC
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
         _motivoRechazoRepo = motivoRechazoRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -105,6 +108,13 @@ public sealed class ReabrirTicketCommandHandler : ICommandHandler<ReabrirTicketC
             var notifCodigo = ticket.Codigo.Valor;
             var notifTitulo = ticket.Titulo;
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             if (tecnicoAnteriorId.HasValue)
             {
                 var notifTecnicoAnteriorId = tecnicoAnteriorId.Value;
@@ -146,6 +156,7 @@ public sealed class ReabrirTicketCommandHandler : ICommandHandler<ReabrirTicketC
                                 codigo: codigoTicket,
                                 titulo: tituloTicket,
                                 motivo: motivo,
+                                correosCc: correosCc,
                                 cancellationToken: CancellationToken.None);
                         }
                         catch (Exception ex)

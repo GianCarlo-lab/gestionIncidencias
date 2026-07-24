@@ -1,21 +1,58 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, Building2, Globe, Power } from 'lucide-react'
+import { ArrowLeft, Pencil, Building2, Globe, Power, Mail, X, Plus, Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { z } from 'zod'
 import { Button } from '@shared/ui/button'
 import { Badge } from '@shared/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card'
 import { Skeleton } from '@shared/ui/skeleton'
+import { Input } from '@shared/ui/input'
 import { ConfirmDialog } from '@shared/components/ConfirmDialog'
-import { useEmpresa, useToggleEmpresa } from '../hooks/useEmpresas'
+import { useAuthStore } from '@store/auth.store'
+import {
+  useEmpresa,
+  useToggleEmpresa,
+  useCorreosCopiaEmpresa,
+  useAgregarCorreoCopia,
+  useEliminarCorreoCopia,
+} from '../hooks/useEmpresas'
 import { ROUTES, empresaEditPath } from '@constants/index'
+
+const emailSchema = z.string().email()
 
 export function EmpresaDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [confirmToggle, setConfirmToggle] = useState(false)
+  const [nuevoCorreo, setNuevoCorreo] = useState('')
+  const [nuevoCorreoError, setNuevoCorreoError] = useState<string | null>(null)
+
+  const currentUser = useAuthStore((s) => s.user)
 
   const { data: empresa, isLoading, isError } = useEmpresa(id ?? '')
   const toggleEmpresa = useToggleEmpresa()
+
+  const puedeEditar =
+    currentUser?.rol === 'superadmin' ||
+    (currentUser?.rol === 'admin' && currentUser?.empresaId === (id ?? ''))
+
+  const correosCopiaQuery = useCorreosCopiaEmpresa(id ?? '')
+  const agregarCorreo = useAgregarCorreoCopia(id ?? '')
+  const eliminarCorreo = useEliminarCorreoCopia(id ?? '')
+
+  function handleAgregarCorreo() {
+    const trimmed = nuevoCorreo.trim()
+    if (!trimmed) return
+    const parsed = emailSchema.safeParse(trimmed)
+    if (!parsed.success) {
+      setNuevoCorreoError('Ingresa un correo electrónico válido.')
+      return
+    }
+    setNuevoCorreoError(null)
+    agregarCorreo.mutate(trimmed, {
+      onSuccess: () => setNuevoCorreo(''),
+    })
+  }
 
   if (isLoading) {
     return (
@@ -172,6 +209,104 @@ export function EmpresaDetailPage() {
               </CardContent>
             </Card>
           )}
+          {/* Correos en copia */}
+          <Card>
+            <CardHeader className="px-3 pb-2 pt-3">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                Correos en copia
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 p-3 pt-0">
+              {correosCopiaQuery.isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-7 w-full" />
+                  <Skeleton className="h-7 w-3/4" />
+                </div>
+              ) : (
+                <>
+                  {/* Lista de correos */}
+                  {(correosCopiaQuery.data ?? []).length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {(correosCopiaQuery.data ?? []).map((item) => (
+                        <Badge
+                          key={item.id}
+                          variant="secondary"
+                          className="flex h-6 items-center gap-1 pr-1 text-[11px] font-normal"
+                        >
+                          <span className="max-w-[200px] truncate">{item.correo}</span>
+                          {puedeEditar && (
+                            <button
+                              type="button"
+                              onClick={() => eliminarCorreo.mutate(item.id)}
+                              disabled={eliminarCorreo.isPending}
+                              className="ml-0.5 shrink-0 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive disabled:opacity-50"
+                              aria-label={`Eliminar ${item.correo}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    !puedeEditar && (
+                      <p className="text-xs text-muted-foreground">
+                        Sin correos en copia configurados.
+                      </p>
+                    )
+                  )}
+
+                  {/* Input para agregar — solo para usuarios con permiso */}
+                  {puedeEditar && (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <Input
+                          type="email"
+                          value={nuevoCorreo}
+                          onChange={(e) => {
+                            setNuevoCorreo(e.target.value)
+                            if (nuevoCorreoError) setNuevoCorreoError(null)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              handleAgregarCorreo()
+                            }
+                          }}
+                          placeholder="nuevo@empresa.com"
+                          className="h-8 flex-1 text-xs"
+                          disabled={agregarCorreo.isPending}
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="h-8 gap-1.5 px-3"
+                          onClick={handleAgregarCorreo}
+                          disabled={agregarCorreo.isPending || !nuevoCorreo.trim()}
+                        >
+                          {agregarCorreo.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Plus className="h-3.5 w-3.5" />
+                          )}
+                          Agregar
+                        </Button>
+                      </div>
+                      {nuevoCorreoError && (
+                        <p className="text-[11px] text-destructive">{nuevoCorreoError}</p>
+                      )}
+                      <p className="text-[11px] text-muted-foreground">
+                        Estos correos recibirán copia de las notificaciones de todos los tickets de
+                        esta empresa.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Panel lateral */}

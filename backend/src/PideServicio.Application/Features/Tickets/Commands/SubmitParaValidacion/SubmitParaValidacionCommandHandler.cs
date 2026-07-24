@@ -15,6 +15,7 @@ public sealed class SubmitParaValidacionCommandHandler : ICommandHandler<SubmitP
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ITicketRepository _ticketRepo;
     private readonly ITicketHistorialRepository _historialRepo;
+    private readonly IEmpresaCorreoCopiaRepository _empresaCorreoCopiaRepo;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
     private readonly IAuditService _auditService;
@@ -25,6 +26,7 @@ public sealed class SubmitParaValidacionCommandHandler : ICommandHandler<SubmitP
         IUsuarioRepository usuarioRepository,
         ITicketRepository ticketRepo,
         ITicketHistorialRepository historialRepo,
+        IEmpresaCorreoCopiaRepository empresaCorreoCopiaRepo,
         INotificationService notificationService,
         IEmailService emailService,
         IAuditService auditService,
@@ -34,6 +36,7 @@ public sealed class SubmitParaValidacionCommandHandler : ICommandHandler<SubmitP
         _usuarioRepository = usuarioRepository;
         _ticketRepo = ticketRepo;
         _historialRepo = historialRepo;
+        _empresaCorreoCopiaRepo = empresaCorreoCopiaRepo;
         _notificationService = notificationService;
         _emailService = emailService;
         _auditService = auditService;
@@ -128,6 +131,13 @@ public sealed class SubmitParaValidacionCommandHandler : ICommandHandler<SubmitP
                 }
             }, CancellationToken.None);
 
+            // Materializar CC: correos de copia empresa + correos del jefe del ticket
+            var correosCopiaEmpresa = await _empresaCorreoCopiaRepo.ListarCorreosPorEmpresaAsync(ticket.EmpresaId, cancellationToken);
+            IReadOnlyList<string> correosCc = correosCopiaEmpresa
+                .Concat(ticket.CorreosJefe)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             // Email al solicitante — fire-and-forget con try-catch explícito
             var solicitante = await _usuarioRepository.ObtenerPorIdAsync(ticket.SolicitanteId, cancellationToken);
             if (solicitante is not null)
@@ -154,6 +164,7 @@ public sealed class SubmitParaValidacionCommandHandler : ICommandHandler<SubmitP
                             codigo: codigoTicket,
                             titulo: tituloTicket,
                             tecnico: tecnicoNombreCaptura,
+                            correosCc: correosCc,
                             cancellationToken: CancellationToken.None);
                     }
                     catch (Exception ex)

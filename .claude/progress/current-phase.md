@@ -2,9 +2,13 @@
 
 ## Fase Actual: 7.0 EN CURSO — Hardening y Estabilización RC
 
-**Estado:** Auditoría completada, correcciones aplicadas, bloqueantes identificados.
+**Estado:** Auditoría completada, correcciones aplicadas, bloqueantes identificados. Módulo Usuarios (Fase 2 multi-sucursal) completado y pusheado — commit 37c5a14. Funcionalidad CC en emails implementada fullstack (2026-07-24).
 
-**Completado:** Auditoría exhaustiva por 8 agentes. 35+ correcciones aplicadas.
+**Última tarea completada (2026-07-24):** CC (copia) en notificaciones de email — tabla `empresa_correos_copia`, columna `tickets.correos_jefe`, entidad + repositorio + CRUD Application, `EmailService` refactorizado con campo `cc` real de Brevo API, 8 handlers de estado actualizados, `CrearTicketCommand` con `CorreosJefe`, 3 endpoints nuevos en `EmpresasController`, `EmailChipsInput.tsx`, `CreateTicketPage.tsx` (sección Supervisores), `EmpresaDetailPage.tsx` (card correos en copia). Build backend: 0 errores. TypeScript: 0 errores. Pendiente: usuario ejecuta SQL en Supabase y hace deploy.
+
+**Tarea anterior (2026-07-22):** Soporte multi-sucursal para usuarios — 10 archivos agregados al repositorio, fallo de build en Render corregido. Funcionalidad completa: backend (entidad, repositorio, comando CQRS, validador, DTOs) + frontend (SucursalMultiSelector).
+
+**Completado antes:** Auditoría exhaustiva por 8 agentes. 35+ correcciones aplicadas.
 
 **Bloqueantes para UAT/RC (en orden de prioridad):**
 1. L001 — Supabase Auth Hook (CRÍTICO — bloquea todo el flujo de auth)
@@ -18,6 +22,8 @@
 **Porcentaje preparación producción:** 62%
 **¿Apto para UAT?** NO
 **¿Apto para RC v1.0?** NO
+
+**Próximo paso:** El usuario define qué módulo o bloqueante se aborda a continuación.
 
 ---
 

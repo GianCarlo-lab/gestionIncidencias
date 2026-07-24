@@ -40,6 +40,7 @@ public interface IEmailService
         string prioridad,
         string area,
         string solicitante,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -55,6 +56,7 @@ public interface IEmailService
         string? sucursal = null,
         string? area = null,
         string? solicitante = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -70,6 +72,7 @@ public interface IEmailService
         string? sucursal = null,
         string? area = null,
         string? solicitante = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     Task NotificarAsignacionASolicitanteAsync(
@@ -78,6 +81,7 @@ public interface IEmailService
         string? titulo,
         string tecnico,
         string prioridad,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     Task NotificarTicketPendienteValidacionAsync(
@@ -85,6 +89,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string tecnico,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al solicitante que su ticket fue cerrado/validado.</summary>
@@ -93,6 +98,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string? valoracion,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al técnico que el ticket fue cerrado por el solicitante.</summary>
@@ -101,6 +107,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string? valoracion,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     Task NotificarTicketReabiertoAsync(
@@ -108,6 +115,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string motivo,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al solicitante (y copia) que su ticket fue cancelado.</summary>
@@ -116,6 +124,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string motivo,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al solicitante que el técnico inició la atención de su ticket.</summary>
@@ -124,6 +133,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string? tecnico = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al técnico anterior que fue desasignado debido a una reasignación.</summary>
@@ -132,6 +142,7 @@ public interface IEmailService
         string codigo,
         string? titulo,
         string? motivo = null,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Notifica al técnico asignado que la prioridad de su ticket fue modificada.</summary>
@@ -141,5 +152,6 @@ public interface IEmailService
         string? titulo,
         string prioridadAnterior,
         string prioridadNueva,
+        IReadOnlyList<string>? correosCc = null,
         CancellationToken cancellationToken = default);
 }
